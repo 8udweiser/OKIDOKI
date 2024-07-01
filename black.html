@@ -146,6 +146,7 @@
         <button onclick="replaceOrRemove()">回を消去</button>
         <button onclick="calculateTotals()">総回転数を計算</button>
         <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
+	<button onclick="displayTableAsImage()">テーブルを画像として表示</button>
     </div>
     <div class="settings">
         <label for="bigValue">ビッグの値:</label>
@@ -171,8 +172,19 @@
         </tbody>
     </table>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function saveData() {
+    const dataInput = document.getElementById("dataInput").value;
+    localStorage.setItem("savedData", dataInput);
+}
 
-
+function loadData() {
+    const savedData = localStorage.getItem("savedData");
+    if (savedData) {
+        document.getElementById("dataInput").value = savedData;
+    }
+}
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById('input-field');
@@ -249,6 +261,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <script>
+function saveData() {
+    const dataInput = document.getElementById("dataInput").value;
+    localStorage.setItem("savedData", dataInput);
+}
+
+function loadData() {
+    const savedData = localStorage.getItem("savedData");
+    if (savedData) {
+        document.getElementById("dataInput").value = savedData;
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // 既存のコード...
+
+    // ページ読み込み時にデータを読み込む
+    loadData();
+
+    // データ入力エリアの変更を監視し、変更があればデータを保存
+    document.getElementById("dataInput").addEventListener("input", saveData);
+
+    // 既存の関数を修正
+    function calculateTotals() {
+        // 既存のコード...
+
+        // 計算後にデータを保存
+        saveData();
+    }
+
+    function addEntry(bonusType) {
+        // 既存のコード...
+
+        // エントリー追加後にデータを保存
+        saveData();
+    }
+
+    // DELボタンの処理を修正
+    delButton.addEventListener('click', function() {
+        // 既存のコード...
+
+        // データ削除後にデータを保存
+        saveData();
+    });
+
+    // その他の既存のコード...
+});
+</script>
+
+
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     // 既存のコードはそのままで、以下を追加
 
@@ -262,12 +323,44 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentViewers = Math.floor(Math.random() * 10) + 1; // 1から10のランダムな数
     document.getElementById('currentViewers').textContent = currentViewers;
 
-    // 30秒ごとに閲覧者数を更新
+    // 180秒ごとに閲覧者数を更新
     setInterval(() => {
         currentViewers = Math.floor(Math.random() * 10) + 1;
         document.getElementById('currentViewers').textContent = currentViewers;
-    }, 30000);
+    }, 180000);
 });
+</script>
+
+
+<script>
+function displayTableAsImage() {
+    html2canvas(document.getElementById('dataTable')).then(canvas => {
+        // キャンバスを画像データURLに変換
+        const imageDataUrl = canvas.toDataURL('image/png');
+
+        // 新しいウィンドウを開く
+        const newWindow = window.open('', '_blank');
+
+        // 新しいウィンドウにHTMLを書き込む
+        newWindow.document.write(`
+            <html>
+            <head>
+                <title>テーブル画像</title>
+                <style>
+                    body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; }
+                    img { max-width: 100%; height: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                </style>
+            </head>
+            <body>
+                <img src="${imageDataUrl}" alt="テーブル画像">
+            </body>
+            </html>
+        `);
+
+        // 新しいウィンドウのドキュメントを閉じる（重要）
+        newWindow.document.close();
+    });
+}
 </script>
 
 
