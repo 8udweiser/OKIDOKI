@@ -106,10 +106,6 @@
     </style>
 </head>
 <body>
-<div id="stats" style="position: fixed; top: 10px; right: 10px; background-color: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; font-size: 12px;">
-    <div>現在の閲覧者数: <span id="currentViewers">1</span></div>
-    <div>総アクセス数: <span id="totalAccesses">1</span></div>
-</div>
 <div id="touch-panel">
   <div class="row">
     <button class="num-btn">7</button>
@@ -244,29 +240,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputField.value = '';
         calculateTotals();
     }
-});
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 既存のコードはそのままで、以下を追加
-
-    // アクセス数のシミュレーション
-    let totalAccesses = localStorage.getItem('totalAccesses') || 0;
-    totalAccesses = parseInt(totalAccesses) + 1;
-    localStorage.setItem('totalAccesses', totalAccesses);
-    document.getElementById('totalAccesses').textContent = totalAccesses;
-
-    // 現在の閲覧者数のシミュレーション
-    let currentViewers = Math.floor(Math.random() * 10) + 1; // 1から10のランダムな数
-    document.getElementById('currentViewers').textContent = currentViewers;
-
-    // 180秒ごとに閲覧者数を更新
-    setInterval(() => {
-        currentViewers = Math.floor(Math.random() * 10) + 1;
-        document.getElementById('currentViewers').textContent = currentViewers;
-    }, 180000);
 });
 </script>
 
