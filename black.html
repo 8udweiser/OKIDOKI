@@ -174,19 +174,6 @@
     </table>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-function saveData() {
-    const dataInput = document.getElementById("dataInput").value;
-    localStorage.setItem("savedData", dataInput);
-}
-
-function loadData() {
-    const savedData = localStorage.getItem("savedData");
-    if (savedData) {
-        document.getElementById("dataInput").value = savedData;
-    }
-}
-</script>
-<script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById('input-field');
     const numButtons = document.querySelectorAll('.num-btn');
