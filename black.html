@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>沖ドキ！BLACK有利チェッカー</title>
     <style>
         body {
@@ -248,31 +248,27 @@ document.addEventListener('DOMContentLoaded', function() {
 function displayTableAsImage() {
     html2canvas(document.getElementById('dataTable')).then(canvas => {
         // キャンバスを画像データURLに変換
-        const imageDataUrl = canvas.toDataURL('image/png');
-
-        // 新しいウィンドウを開く
-        const newWindow = window.open('', '_blank');
-
-        // 新しいウィンドウにHTMLを書き込む
-        newWindow.document.write(`
-            <html>
-            <head>
-                <title>テーブル画像</title>
-                <style>
-                    body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; }
-                    img { max-width: 100%; height: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-                </style>
-            </head>
-            <body>
-                <img src="${imageDataUrl}" alt="テーブル画像">
-            </body>
-            </html>
-        `);
-
-        // 新しいウィンドウのドキュメントを閉じる（重要）
-        newWindow.document.close();
+        const dataURL = canvas.toDataURL('image/png');
+        
+        // 画像リンクを作成
+        const imgLink = document.createElement('a');
+        imgLink.href = dataURL;
+        imgLink.download = 'table.png';
+        imgLink.textContent = 'ここをクリックして画像をダウンロード';
+        imgLink.style.color = '#00f';
+        
+        // 既存のリンクを削除
+        const existingLink = document.getElementById('downloadLink');
+        if (existingLink) {
+            existingLink.remove();
+        }
+        
+        // 新しいリンクをDOMに追加
+        imgLink.id = 'downloadLink';
+        document.body.appendChild(imgLink);
     });
 }
+</script>
 </script>
 
 
