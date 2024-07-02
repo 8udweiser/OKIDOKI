@@ -11,6 +11,7 @@
             background-color: #1c1c1c;
             color: #f0f0f0;
 	    font-size: 12px;
+            touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
         }
         textarea {
             width: 100%;
@@ -339,6 +340,16 @@ function displayTableAsImage() {
                 link.click();
             });
         }
-    </script>
+    </script><script>
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 1000) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+</script>
 </body>
 </html>
