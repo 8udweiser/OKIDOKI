@@ -11,7 +11,6 @@
             background-color: #1c1c1c;
             color: #f0f0f0;
 	    font-size: 12px;
-            touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
         }
         textarea {
             width: 100%;
@@ -72,6 +71,7 @@
     flex-direction: column;
     max-width: 300px;
     margin: 20px auto;
+    touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
 }
 .row {
     display: flex;
