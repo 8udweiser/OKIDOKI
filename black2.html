@@ -354,6 +354,34 @@ function displayTableAsImage() {
     }, false);
 </script>
 
+
+<script>
+let lastTouchTime = 0;
+const touchThreshold = 100; // ミリ秒
+
+function handleTouch(event) {
+  const currentTime = new Date().getTime();
+  if (currentTime - lastTouchTime > touchThreshold) {
+    // タッチ処理を行う
+    const touchedNumber = event.target.textContent;
+    // 数字を入力フィールドに追加する処理
+    lastTouchTime = currentTime;
+  }
+}
+
+// 数字ボタンにイベントリスナーを追加
+document.querySelectorAll('.number-button').forEach(button => {
+  button.addEventListener('touchstart', handleTouch, { passive: true });
+});
+</script>
+
+
+
+<script>
+
+</script>
+
+
 <script>
 document.getElementById('number-pad').addEventListener('touchstart', function(event) {
   if (event.target.classList.contains('number-button')) {
