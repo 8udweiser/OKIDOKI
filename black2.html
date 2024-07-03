@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
     <title>沖ドキ！BLACK有利チェッカー</title>
     <style>
         body {
@@ -43,7 +43,6 @@
             padding: 10px 20px;
             cursor: pointer;
             margin-right: 10px;
-            transition: background-color 0.1s ease;
         }
         button:hover {
             background-color: #555;
@@ -72,6 +71,7 @@
             flex-direction: column;
             max-width: 300px;
             margin: 20px auto;
+            touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
         }
         .row {
             display: flex;
@@ -82,7 +82,6 @@
             height: 50px;
             margin: 5px;
             font-size: 12px;
-            transition: background-color 0.1s ease;
         }
         #input-field {
             width: 100%;
@@ -101,7 +100,6 @@
             padding: 10px 20px;
             cursor: pointer;
             margin-right: 10px;
-            transition: background-color 0.1s ease;
         }
         #reverse-toggle.active {
             background-color: #555;
@@ -138,39 +136,40 @@
 </div>
 <input type="text" id="input-field" readonly>
 
-    <h1>データ入力ページ</h1>
-    <textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
-    <div class="button-group">
-        <button onclick="sortData()">データを並び替え</button>
-        <button onclick="replaceOrRemove()">回を消去</button>
-        <button onclick="calculateTotals()">総回転数を計算</button>
-        <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
-        <button onclick="displayTableAsImage()">テーブルを画像として表示</button>
-    </div>
-    <div class="settings">
-        <label for="bigValue">ビッグ:</label>
-        <input type="number" id="bigValue" value="60">
-        <label for="regularValue">レギュラー:</label>
-        <input type="number" id="regularValue" value="25">
-        <label for="resetValue">リセット値:</label>
-        <input type="number" id="resetValue" value="2000">
-        <label for="spinThreshold">リセしない回転数:</label>
-        <input type="number" id="spinThreshold" value="32">
-    </div>
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>時間</th>
-                <th>ボーナス</th>
-                <th>回転数</th>
-                <th>総回転数</th>
-                <th>有利区間</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<h1>データ入力ページ</h1>
+<textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
+<div class="button-group">
+    <button onclick="sortData()">データを並び替え</button>
+    <button onclick="replaceOrRemove()">回を消去</button>
+    <button onclick="calculateTotals()">総回転数を計算</button>
+    <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
+    <button onclick="displayTableAsImage()">テーブルを画像として表示</button>
+</div>
+<div class="settings">
+    <label for="bigValue">ビッグ:</label>
+    <input type="number" id="bigValue" value="60">
+    <label for="regularValue">レギュラー:</label>
+    <input type="number" id="regularValue" value="25">
+    <label for="resetValue">リセット値:</label>
+    <input type="number" id="resetValue" value="2000">
+    <label for="spinThreshold">リセしない回転数:</label>
+    <input type="number" id="spinThreshold" value="32">
+</div>
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>時間</th>
+            <th>ボーナス</th>
+            <th>回転数</th>
+            <th>総回転数</th>
+            <th>有利区間</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById('input-field');
@@ -183,28 +182,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataInput = document.getElementById('dataInput');
     let isReverse = false;
 
+    // デバウンス関数
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
     // 数字ボタンの処理
     numButtons.forEach(button => {
-        button.addEventListener('touchstart', function() {
+        button.addEventListener('click', debounce(function() {
             inputField.value += this.textContent;
-            this.style.backgroundColor = '#555';
-        });
-        button.addEventListener('touchend', function() {
-            this.style.backgroundColor = '';
-        });
+        }, 200), { passive: true });
     });
 
     // バックスペースボタンの処理
-    bsButton.addEventListener('touchstart', function() {
+    bsButton.addEventListener('click', debounce(function() {
         inputField.value = inputField.value.slice(0, -1);
-        this.style.backgroundColor = '#555';
-    });
-    bsButton.addEventListener('touchend', function() {
-        this.style.backgroundColor = '';
-    });
+    }, 200), { passive: true });
 
     // DELボタンの処理
-    delButton.addEventListener('touchstart', function() {
+    delButton.addEventListener('click', debounce(function() {
         let data = dataInput.value.trim().split('\n');
         if (data.length > 0) {
             if (isReverse) {
@@ -215,131 +215,114 @@ document.addEventListener('DOMContentLoaded', function() {
             dataInput.value = data.join('\n');
             calculateTotals(); // データが変更されたので、総計を再計算
         }
-        this.style.backgroundColor = '#555';
-    });
-    delButton.addEventListener('touchend', function() {
-        this.style.backgroundColor = '';
-    });
+    }, 200), { passive: true });
 
     // トグルボタンの処理
-    reverseToggle.addEventListener('click', function() {
+    reverseToggle.addEventListener('click', debounce(function() {
         isReverse = !isReverse;
         this.classList.toggle('active', isReverse);
-    });
+    }, 200), { passive: true });
 
     // ビッグボタンの処理
-    bigButton.addEventListener('touchstart', function() {
+    bigButton.addEventListener('click', debounce(function() {
         addEntry('ビッグ');
-        this.style.backgroundColor = '#555';
-    });
-    bigButton.addEventListener('touchend', function() {
-        this.style.backgroundColor = '';
-    });
+    }, 200), { passive: true });
 
     // レギュラーボタンの処理
-    regularButton.addEventListener('touchstart', function() {
+    regularButton.addEventListener('click', debounce(function() {
         addEntry('レギュラー');
-        this.style.backgroundColor = '#555';
-    });
-    regularButton.addEventListener('touchend', function() {
-        this.style.backgroundColor = '';
-    });
+    }, 200), { passive: true });
 
-    function addEntry(type) {
-        const time = new Date().toLocaleTimeString();
-        const spins = inputField.value.trim();
-
-        if (!spins) return;
-
-        const entry = `${time}\t${type}\t${spins}`;
-        if (isReverse) {
-            dataInput.value = entry + '\n' + dataInput.value.trim();
-        } else {
-            dataInput.value = dataInput.value.trim() + '\n' + entry;
-        }
-
-        inputField.value = '';
-        calculateTotals(); // データが変更されたので、総計を再計算
-    }
-});
-
-function sortData() {
-    const textarea = document.getElementById('dataInput');
-    const lines = textarea.value.trim().split('\n');
-    const sortedLines = lines.sort();
-    textarea.value = sortedLines.join('\n');
-}
-
-function replaceOrRemove() {
-    const textarea = document.getElementById('dataInput');
-    const content = textarea.value;
-    const modifiedContent = content.replace(/回/g, '');
-    textarea.value = modifiedContent;
-}
-
-function calculateTotals() {
-    const textarea = document.getElementById('dataInput');
-    const content = textarea.value.trim();
-    const rows = content.split('\n');
-    const bigValue = parseInt(document.getElementById('bigValue').value, 10);
-    const regularValue = parseInt(document.getElementById('regularValue').value, 10);
-    const resetValue = parseInt(document.getElementById('resetValue').value, 10);
-    const spinThreshold = parseInt(document.getElementById('spinThreshold').value, 10);
-    
-    let totalSpins = 0;
-    let advantageousZone = 0;
-
-    const tableBody = document.getElementById('dataTable').querySelector('tbody');
-    tableBody.innerHTML = '';
-
-    rows.forEach(row => {
-        const columns = row.split('\t');
-        if (columns.length === 3) {
-            const time = columns[0];
-            const bonusType = columns[1];
-            const spins = parseInt(columns[2], 10);
-
-            if (bonusType === 'ビッグ') {
-                advantageousZone += bigValue;
-            } else if (bonusType === 'レギュラー') {
-                advantageousZone += regularValue;
-            }
-
-            if (spins >= spinThreshold) {
-                advantageousZone = Math.min(advantageousZone, resetValue);
+    function addEntry(bonusType) {
+        const now = new Date().toLocaleTimeString();
+        const spinCount = parseInt(inputField.value, 10) || 0;
+        if (spinCount > 0) {
+            const data = dataInput.value.trim().split('\n');
+            const newEntry = `${now},${bonusType},${spinCount}`;
+            if (isReverse) {
+                data.unshift(newEntry);
             } else {
-                advantageousZone += spins;
+                data.push(newEntry);
+            }
+            dataInput.value = data.join('\n');
+            inputField.value = '';
+            calculateTotals();
+        }
+    }
+
+    function sortData() {
+        const data = dataInput.value.trim().split('\n').map(line => {
+            const [time, bonus, spins] = line.split(',');
+            return { time, bonus, spins: parseInt(spins, 10) };
+        });
+        data.sort((a, b) => a.spins - b.spins);
+        dataInput.value = data.map(entry => `${entry.time},${entry.bonus},${entry.spins}`).join('\n');
+    }
+
+    function replaceOrRemove() {
+        const data = dataInput.value.trim().split('\n').map(line => {
+            return line.replace(/回/g, '');
+        });
+        dataInput.value = data.join('\n');
+    }
+
+    function calculateTotals() {
+        const data = dataInput.value.trim().split('\n').map(line => {
+            const [time, bonus, spins] = line.split(',');
+            return { time, bonus, spins: parseInt(spins, 10) };
+        });
+
+        const bigValue = parseInt(document.getElementById('bigValue').value, 10);
+        const regularValue = parseInt(document.getElementById('regularValue').value, 10);
+        const resetValue = parseInt(document.getElementById('resetValue').value, 10);
+        const spinThreshold = parseInt(document.getElementById('spinThreshold').value, 10);
+
+        let totalSpins = 0;
+        let currentSpins = 0;
+        let favorable = false;
+
+        const tbody = document.getElementById('dataTable').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        data.forEach(entry => {
+            const { time, bonus, spins } = entry;
+
+            if (currentSpins >= resetValue) {
+                currentSpins = 0;
             }
 
+            currentSpins += spins;
             totalSpins += spins;
 
-            const newRow = tableBody.insertRow();
-            newRow.insertCell(0).innerText = time;
-            newRow.insertCell(1).innerText = bonusType;
-            newRow.insertCell(2).innerText = spins;
-            newRow.insertCell(3).innerText = totalSpins;
-            newRow.insertCell(4).innerText = advantageousZone;
-        }
-    });
-}
+            if (spins <= spinThreshold) {
+                favorable = !favorable;
+            }
 
-function exportToPNG() {
-    html2canvas(document.getElementById('dataTable')).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'data_table.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-}
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${time}</td><td>${bonus}</td><td>${spins}</td><td>${totalSpins}</td><td>${favorable ? '有利' : '非有利'}</td>`;
+            tbody.appendChild(row);
+        });
+    }
 
-function displayTableAsImage() {
-    html2canvas(document.getElementById('dataTable')).then(canvas => {
-        const imageDataUrl = canvas.toDataURL('image/png');
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write('<html><body><img src="' + imageDataUrl + '"></body></html>');
-        newWindow.document.close();
-    });
-}
+    function exportToPNG() {
+        const table = document.getElementById('dataTable');
+        html2canvas(table).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'table.png';
+            link.click();
+        });
+    }
+
+    function displayTableAsImage() {
+        const table = document.getElementById('dataTable');
+        html2canvas(table).then(canvas => {
+            const img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            document.body.appendChild(img);
+        });
+    }
+});
 </script>
 </body>
 </html>
