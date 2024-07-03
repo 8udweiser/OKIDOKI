@@ -192,7 +192,11 @@ document.addEventListener('DOMContentLoaded', function() {
     event.preventDefault(); // デフォルトのタッチイベントを無効化
     inputField.value += this.textContent;
   }
-
+    // 1000以上の値を入力しないように制限する
+    if (parseInt(inputField.value) > 1000) {
+      inputField.value = '1000';
+    }
+  }
   // バックスペースボタンの処理
   bsButton.addEventListener('click', handleBsClick);
   bsButton.addEventListener('touchstart', handleBsClick);
