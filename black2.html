@@ -378,7 +378,16 @@ document.querySelectorAll('.number-button').forEach(button => {
 
 
 <script>
+function provideFeedback(element) {
+  element.classList.add('touched');
+  setTimeout(() => element.classList.remove('touched'), 100);
+}
 
+function handleTouch(event) {
+  const touchedNumber = event.target.textContent;
+  // 数字を入力フィールドに追加する処理
+  provideFeedback(event.target);
+}
 </script>
 
 
