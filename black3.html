@@ -172,87 +172,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const inputField = document.getElementById('input-field');
-  const numButtons = document.querySelectorAll('.num-btn');
-  const bsButton = document.getElementById('bs-btn');
-  const delButton = document.getElementById('del-btn');
-  const bigButton = document.getElementById('big-btn');
-  const regularButton = document.getElementById('regular-btn');
-  const reverseToggle = document.getElementById('reverse-toggle');
-  const dataInput = document.getElementById('dataInput');
-  let isReverse = false;
+    const inputField = document.getElementById('input-field');
+    const numButtons = document.querySelectorAll('.num-btn');
+    const bsButton = document.getElementById('bs-btn');
+    const delButton = document.getElementById('del-btn');
+    const bigButton = document.getElementById('big-btn');
+    const regularButton = document.getElementById('regular-btn');
+    const reverseToggle = document.getElementById('reverse-toggle');
+    const dataInput = document.getElementById('dataInput');
+    let isReverse = false;
 
-  // 数字ボタンの処理
-  numButtons.forEach(button => {
-    let lastTapTime = 0; // 前回のタップ時間
-    button.addEventListener('touchstart', function(event) {
-      event.preventDefault(); // デフォルトの動作を無効化
-      const tapTime = Date.now();
-      if (tapTime - lastTapTime < 100) { // 100ms以内に連続タップされた場合
-        inputField.value += this.textContent; // 入力フィールドに数字を追加
-      }
-      lastTapTime = tapTime;
+    // 数字ボタンの処理
+    numButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            inputField.value += this.textContent;
+        });
     });
-  });
 
-  // バックスペースボタンの処理
-  bsButton.addEventListener('click', function() {
-    inputField.value = inputField.value.slice(0, -1);
-  });
+    // バックスペースボタンの処理
+    bsButton.addEventListener('click', function() {
+        inputField.value = inputField.value.slice(0, -1);
+    });
 
-  // DELボタンの処理
-  delButton.addEventListener('click', function() {
-    let data = dataInput.value.trim().split('\n');
-    if (data.length > 0) {
-      if (isReverse) {
-        data.shift(); // 逆順モードの場合、最初の要素を削除
-      } else {
-        data.pop(); // 通常モードの場合、最後の要素を削除
-      }
-      dataInput.value = data.join('\n');
-      calculateTotals(); // データが変更されたので、総計を再計算
+    // DELボタンの処理
+    delButton.addEventListener('click', function() {
+        let data = dataInput.value.trim().split('\n');
+        if (data.length > 0) {
+            if (isReverse) {
+                data.shift(); // 逆順モードの場合、最初の要素を削除
+            } else {
+                data.pop(); // 通常モードの場合、最後の要素を削除
+            }
+            dataInput.value = data.join('\n');
+            calculateTotals(); // データが変更されたので、総計を再計算
+        }
+    });
+
+    // トグルボタンの処理
+    reverseToggle.addEventListener('click', function() {
+        isReverse = !isReverse;
+        this.classList.toggle('active', isReverse);
+    });
+
+    // ビッグボタンの処理
+    bigButton.addEventListener('click', function() {
+        addEntry('ビッグ');
+    });
+
+    // レギュラーボタンの処理
+    regularButton.addEventListener('click', function() {
+        addEntry('レギュラー');
+    });
+
+    function addEntry(bonusType) {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const spins = inputField.value || '0';
+        const newEntry = `${time}\t${bonusType}\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+        
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
+        }
+        
+        dataInput.value = data.join('\n');
+        inputField.value = '';
+        calculateTotals();
     }
-  });
-
-  // トグルボタンの処理
-  reverseToggle.addEventListener('click', function() {
-    isReverse = !isReverse;
-    this.classList.toggle('active', isReverse);
-  });
-
-  // ビッグボタンの処理
-  bigButton.addEventListener('click', function() {
-    addEntry('ビッグ');
-  });
-
-  // レギュラーボタンの処理
-  regularButton.addEventListener('click', function() {
-    addEntry('レギュラー');
-  });
-
-  function addEntry(bonusType) {
-    const now = new Date();
-    const time = now.toLocaleTimeString();
-    const spins = inputField.value || '0';
-    const newEntry = `${time}\t${bonusType}\t${spins}`;
-    let data = dataInput.value.trim().split('\n');
-     
-    if (isReverse) {
-      data.unshift(newEntry);
-    } else {
-      data.push(newEntry);
-    }
-     
-    dataInput.value = data.join('\n');
-    inputField.value = '';
-    calculateTotals();
-  }
 });
-
 </script>
-
-
-
 
 
 <script>
@@ -352,12 +342,13 @@ function displayTableAsImage() {
         }
     </script>
 
+
 <script>
     // Prevent zoom on double tap
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(event) {
         const now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 500) {
+        if (now - lastTouchEnd <= 0) {
             event.preventDefault();
         }
         lastTouchEnd = now;
@@ -366,48 +357,14 @@ function displayTableAsImage() {
 
 
 <script>
-let lastTouchTime = 0;
-const touchThreshold = 100; // ミリ秒
-
-function handleTouch(event) {
-  const currentTime = new Date().getTime();
-  if (currentTime - lastTouchTime > touchThreshold) {
-    // タッチ処理を行う
-    const touchedNumber = event.target.textContent;
-    // 数字を入力フィールドに追加する処理
-    lastTouchTime = currentTime;
+document.getElementById('yourForm').addEventListener('submit', function(event) {
+  let inputField = document.getElementById('yourInputField');
+  if (inputField.value > 1000) {
+    inputField.value = 1000;
   }
-}
-
-// 数字ボタンにイベントリスナーを追加
-document.querySelectorAll('.num-btn').forEach(button => {
-  button.addEventListener('touchstart', handleTouch, { passive: true });
 });
 </script>
 
-
-
-<script>
-function provideFeedback(element) {
-  element.classList.add('touch-panel');
-  setTimeout(() => element.classList.remove('touch-panel'), 100);
-}
-
-function handleTouch(event) {
-  const touchedNumber = event.target.textContent;
-  // 数字を入力フィールドに追加する処理
-  provideFeedback(event.target);
-}
-</script>
-
-
-<script>
-document.getElementById('num-btn').addEventListener('touchstart', function(event) {
-  if (event.target.classList.contains('num-btn')) {
-    handleTouch(event);
-  }
-}, { passive: true });
-</script>
 
 </body>
 </html>
