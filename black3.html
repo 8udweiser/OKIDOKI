@@ -172,100 +172,83 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const inputField = document.getElementById('input-field');
-  const numButtons = document.querySelectorAll('.num-btn');
-  const bsButton = document.getElementById('bs-btn');
-  const delButton = document.getElementById('del-btn');
-  const bigButton = document.getElementById('big-btn');
-  const regularButton = document.getElementById('regular-btn');
-  const reverseToggle = document.getElementById('reverse-toggle');
-  const dataInput = document.getElementById('dataInput');
-  let isReverse = false;
+  const inputField = document.getElementById('input-field');
+  const numButtons = document.querySelectorAll('.num-btn');
+  const bsButton = document.getElementById('bs-btn');
+  const delButton = document.getElementById('del-btn');
+  const bigButton = document.getElementById('big-btn');
+  const regularButton = document.getElementById('regular-btn');
+  const reverseToggle = document.getElementById('reverse-toggle');
+  const dataInput = document.getElementById('dataInput');
+  let isReverse = false;
 
-  // 数字ボタンの処理
-  numButtons.forEach(button => {
-    button.addEventListener('click', handleButtonClick);
-    button.addEventListener('touchstart', handleButtonClick);
-  });
+  // 数字ボタンの処理
+  numButtons.forEach(button => {
+    let lastTapTime = 0; // 前回のタップ時間
+    button.addEventListener('touchstart', function(event) {
+      event.preventDefault(); // デフォルトの動作を無効化
+      const tapTime = Date.now();
+      if (tapTime - lastTapTime < 100) { // 100ms以内に連続タップされた場合
+        inputField.value += this.textContent; // 入力フィールドに数字を追加
+      }
+      lastTapTime = tapTime;
+    });
+  });
 
-  function handleButtonClick(event) {
-    event.preventDefault(); // デフォルトのタッチイベントを無効化
-    inputField.value += this.textContent;
-  }
+  // バックスペースボタンの処理
+  bsButton.addEventListener('click', function() {
+    inputField.value = inputField.value.slice(0, -1);
+  });
 
-  // バックスペースボタンの処理
-  bsButton.addEventListener('click', handleBsClick);
-  bsButton.addEventListener('touchstart', handleBsClick);
+  // DELボタンの処理
+  delButton.addEventListener('click', function() {
+    let data = dataInput.value.trim().split('\n');
+    if (data.length > 0) {
+      if (isReverse) {
+        data.shift(); // 逆順モードの場合、最初の要素を削除
+      } else {
+        data.pop(); // 通常モードの場合、最後の要素を削除
+      }
+      dataInput.value = data.join('\n');
+      calculateTotals(); // データが変更されたので、総計を再計算
+    }
+  });
 
-  function handleBsClick(event) {
-    event.preventDefault();
-    inputField.value = inputField.value.slice(0, -1);
-  }
+  // トグルボタンの処理
+  reverseToggle.addEventListener('click', function() {
+    isReverse = !isReverse;
+    this.classList.toggle('active', isReverse);
+  });
 
-  // DELボタンの処理
-  delButton.addEventListener('click', handleDelClick);
-  delButton.addEventListener('touchstart', handleDelClick);
+  // ビッグボタンの処理
+  bigButton.addEventListener('click', function() {
+    addEntry('ビッグ');
+  });
 
-  function handleDelClick(event) {
-    event.preventDefault();
-    let data = dataInput.value.trim().split('\n');
-    if (data.length > 0) {
-      if (isReverse) {
-        data.shift(); // 逆順モードの場合、最初の要素を削除
-      } else {
-        data.pop(); // 通常モードの場合、最後の要素を削除
-      }
-      dataInput.value = data.join('\n');
-      calculateTotals(); // データが変更されたので、総計を再計算
-    }
-  }
+  // レギュラーボタンの処理
+  regularButton.addEventListener('click', function() {
+    addEntry('レギュラー');
+  });
 
-  // トグルボタンの処理
-  reverseToggle.addEventListener('click', handleToggleClick);
-  reverseToggle.addEventListener('touchstart', handleToggleClick);
-
-  function handleToggleClick(event) {
-    event.preventDefault();
-    isReverse = !isReverse;
-    this.classList.toggle('active', isReverse);
-  }
-
-  // ビッグボタンの処理
-  bigButton.addEventListener('click', handleBigClick);
-  bigButton.addEventListener('touchstart', handleBigClick);
-
-  function handleBigClick(event) {
-    event.preventDefault();
-    addEntry('ビッグ');
-  }
-
-  // レギュラーボタンの処理
-  regularButton.addEventListener('click', handleRegularClick);
-  regularButton.addEventListener('touchstart', handleRegularClick);
-
-  function handleRegularClick(event) {
-    event.preventDefault();
-    addEntry('レギュラー');
-  }
-
-  function addEntry(bonusType) {
-    const now = new Date();
-    const time = now.toLocaleTimeString();
-    const spins = inputField.value || '0';
-    const newEntry = `${time}\t${bonusType}\t${spins}`;
-    let data = dataInput.value.trim().split('\n');
-     
-    if (isReverse) {
-      data.unshift(newEntry);
-    } else {
-      data.push(newEntry);
-    }
-     
-    dataInput.value = data.join('\n');
-    inputField.value = '';
-    calculateTotals();
-  }
+  function addEntry(bonusType) {
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+    const spins = inputField.value || '0';
+    const newEntry = `${time}\t${bonusType}\t${spins}`;
+    let data = dataInput.value.trim().split('\n');
+     
+    if (isReverse) {
+      data.unshift(newEntry);
+    } else {
+      data.push(newEntry);
+    }
+     
+    dataInput.value = data.join('\n');
+    inputField.value = '';
+    calculateTotals();
+  }
 });
+
 </script>
 
 
