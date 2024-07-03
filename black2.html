@@ -10,7 +10,7 @@
             margin: 20px;
             background-color: #1c1c1c;
             color: #f0f0f0;
-            font-size: 12px;
+	    font-size: 12px;
         }
         textarea {
             width: 100%;
@@ -66,44 +66,44 @@
             width: 50px;
             margin-right: 20px;
         }
-        #touch-panel {
-            display: flex;
-            flex-direction: column;
-            max-width: 300px;
-            margin: 20px auto;
-            touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
-        }
-        .row {
-            display: flex;
-            justify-content: space-between;
-        }
-        #touch-panel button {
-            width: 30%;
-            height: 50px;
-            margin: 5px;
-            font-size: 12px;
-        }
-        #input-field {
-            width: 100%;
-            height: 40px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            background-color: #2b2b2b;
-            color: #f0f0f0;
-            border: 1px solid #444;
-            padding: 5px;
-        }
-        #reverse-toggle {
-            background-color: #444;
-            color: #f0f0f0;
-            border: 1px solid #555;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        #reverse-toggle.active {
-            background-color: #555;
-        }
+#touch-panel {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    margin: 20px auto;
+    touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+#touch-panel button {
+    width: 30%;
+    height: 50px;
+    margin: 5px;
+    font-size: 12px;
+}
+#input-field {
+    width: 100%;
+    height: 40px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    background-color: #2b2b2b;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    padding: 5px;
+}
+#reverse-toggle {
+    background-color: #444;
+    color: #f0f0f0;
+    border: 1px solid #555;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+#reverse-toggle.active {
+    background-color: #555;
+}
     </style>
 </head>
 <body>
@@ -137,39 +137,39 @@
 <input type="text" id="input-field" readonly>
 
 
-<h1>データ入力ページ</h1>
-<textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
-<div class="button-group">
-    <button onclick="sortData()">データを並び替え</button>
-    <button onclick="replaceOrRemove()">回を消去</button>
-    <button onclick="calculateTotals()">総回転数を計算</button>
-    <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
-    <button onclick="displayTableAsImage()">テーブルを画像として表示</button>
-</div>
-<div class="settings">
-    <label for="bigValue">ビッグ:</label>
-    <input type="number" id="bigValue" value="60">
-    <label for="regularValue">レギュラー:</label>
-    <input type="number" id="regularValue" value="25">
-    <label for="resetValue">リセット値:</label>
-    <input type="number" id="resetValue" value="2000">
-    <label for="spinThreshold">リセしない回転数:</label>
-    <input type="number" id="spinThreshold" value="32">
-</div>
-<table id="dataTable">
-    <thead>
-        <tr>
-            <th>時間</th>
-            <th>ボーナス</th>
-            <th>回転数</th>
-            <th>総回転数</th>
-            <th>有利区間</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <h1>データ入力ページ</h1>
+    <textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
+    <div class="button-group">
+        <button onclick="sortData()">データを並び替え</button>
+        <button onclick="replaceOrRemove()">回を消去</button>
+        <button onclick="calculateTotals()">総回転数を計算</button>
+        <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
+	<button onclick="displayTableAsImage()">テーブルを画像として表示</button>
+    </div>
+    <div class="settings">
+        <label for="bigValue">ビッグ:</label>
+        <input type="number" id="bigValue" value="60">
+        <label for="regularValue">レギュラー:</label>
+        <input type="number" id="regularValue" value="25">
+        <label for="resetValue">リセット値:</label>
+        <input type="number" id="resetValue" value="2000">
+        <label for="spinThreshold">リセしない回転数:</label>
+        <input type="number" id="spinThreshold" value="32">
+    </div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>時間</th>
+                <th>ボーナス</th>
+                <th>回転数</th>
+                <th>総回転数</th>
+                <th>有利区間</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById('input-field');
@@ -182,29 +182,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataInput = document.getElementById('dataInput');
     let isReverse = false;
 
-    // デバウンス関数
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
     // 数字ボタンの処理
     numButtons.forEach(button => {
-        button.addEventListener('click', debounce(function() {
+        button.addEventListener('click', function() {
             inputField.value += this.textContent;
-        }, 200), { passive: true });
+        });
     });
 
     // バックスペースボタンの処理
-    bsButton.addEventListener('click', debounce(function() {
+    bsButton.addEventListener('click', function() {
         inputField.value = inputField.value.slice(0, -1);
-    }, 200), { passive: true });
+    });
 
     // DELボタンの処理
-    delButton.addEventListener('click', debounce(function() {
+    delButton.addEventListener('click', function() {
         let data = dataInput.value.trim().split('\n');
         if (data.length > 0) {
             if (isReverse) {
@@ -215,114 +206,161 @@ document.addEventListener('DOMContentLoaded', function() {
             dataInput.value = data.join('\n');
             calculateTotals(); // データが変更されたので、総計を再計算
         }
-    }, 200), { passive: true });
+    });
 
     // トグルボタンの処理
-    reverseToggle.addEventListener('click', debounce(function() {
+    reverseToggle.addEventListener('click', function() {
         isReverse = !isReverse;
         this.classList.toggle('active', isReverse);
-    }, 200), { passive: true });
+    });
 
     // ビッグボタンの処理
-    bigButton.addEventListener('click', debounce(function() {
+    bigButton.addEventListener('click', function() {
         addEntry('ビッグ');
-    }, 200), { passive: true });
+    });
 
     // レギュラーボタンの処理
-    regularButton.addEventListener('click', debounce(function() {
+    regularButton.addEventListener('click', function() {
         addEntry('レギュラー');
-    }, 200), { passive: true });
+    });
 
     function addEntry(bonusType) {
-        const now = new Date().toLocaleTimeString();
-        const spinCount = parseInt(inputField.value, 10) || 0;
-        if (spinCount > 0) {
-            const data = dataInput.value.trim().split('\n');
-            const newEntry = `${now},${bonusType},${spinCount}`;
-            if (isReverse) {
-                data.unshift(newEntry);
-            } else {
-                data.push(newEntry);
-            }
-            dataInput.value = data.join('\n');
-            inputField.value = '';
-            calculateTotals();
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const spins = inputField.value || '0';
+        const newEntry = `${time}\t${bonusType}\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+        
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
         }
-    }
-
-    function sortData() {
-        const data = dataInput.value.trim().split('\n').map(line => {
-            const [time, bonus, spins] = line.split(',');
-            return { time, bonus, spins: parseInt(spins, 10) };
-        });
-        data.sort((a, b) => a.spins - b.spins);
-        dataInput.value = data.map(entry => `${entry.time},${entry.bonus},${entry.spins}`).join('\n');
-    }
-
-    function replaceOrRemove() {
-        const data = dataInput.value.trim().split('\n').map(line => {
-            return line.replace(/回/g, '');
-        });
+        
         dataInput.value = data.join('\n');
-    }
-
-    function calculateTotals() {
-        const data = dataInput.value.trim().split('\n').map(line => {
-            const [time, bonus, spins] = line.split(',');
-            return { time, bonus, spins: parseInt(spins, 10) };
-        });
-
-        const bigValue = parseInt(document.getElementById('bigValue').value, 10);
-        const regularValue = parseInt(document.getElementById('regularValue').value, 10);
-        const resetValue = parseInt(document.getElementById('resetValue').value, 10);
-        const spinThreshold = parseInt(document.getElementById('spinThreshold').value, 10);
-
-        let totalSpins = 0;
-        let currentSpins = 0;
-        let favorable = false;
-
-        const tbody = document.getElementById('dataTable').querySelector('tbody');
-        tbody.innerHTML = '';
-
-        data.forEach(entry => {
-            const { time, bonus, spins } = entry;
-
-            if (currentSpins >= resetValue) {
-                currentSpins = 0;
-            }
-
-            currentSpins += spins;
-            totalSpins += spins;
-
-            if (spins <= spinThreshold) {
-                favorable = !favorable;
-            }
-
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${time}</td><td>${bonus}</td><td>${spins}</td><td>${totalSpins}</td><td>${favorable ? '有利' : '非有利'}</td>`;
-            tbody.appendChild(row);
-        });
-    }
-
-    function exportToPNG() {
-        const table = document.getElementById('dataTable');
-        html2canvas(table).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'table.png';
-            link.click();
-        });
-    }
-
-    function displayTableAsImage() {
-        const table = document.getElementById('dataTable');
-        html2canvas(table).then(canvas => {
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL('image/png');
-            document.body.appendChild(img);
-        });
+        inputField.value = '';
+        calculateTotals();
     }
 });
 </script>
+
+
+<script>
+function displayTableAsImage() {
+    html2canvas(document.getElementById('dataTable')).then(canvas => {
+        // キャンバスを画像データURLに変換
+        const imageDataUrl = canvas.toDataURL('image/png');
+
+        // 新しいウィンドウを開く
+        const newWindow = window.open('', '_blank');
+
+        // 新しいウィンドウにHTMLを書き込む
+        newWindow.document.write(`
+            <html>
+            <head>
+                <title>テーブル画像</title>
+                <style>
+                    body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; }
+                    img { max-width: 100%; height: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                </style>
+            </head>
+            <body>
+                <img src="${imageDataUrl}" alt="テーブル画像">
+            </body>
+            </html>
+        `);
+
+        // 新しいウィンドウのドキュメントを閉じる（重要）
+        newWindow.document.close();
+    });
+}
+</script>
+
+
+    <script>
+        function sortData() {
+            let data = document.getElementById("dataInput").value.trim().split('\n');
+            data.sort((a, b) => {
+                let timeA = a.split('\t')[0];
+                let timeB = b.split('\t')[0];
+                return timeA.localeCompare(timeB);
+            });
+            document.getElementById("dataInput").value = data.join('\n');
+        }
+
+        function replaceOrRemove() {
+            let data = document.getElementById("dataInput").value;
+            data = data.replace(/回/g, '');
+            document.getElementById("dataInput").value = data;
+        }
+
+        function calculateTotals() {
+            let bigValue = parseInt(document.getElementById("bigValue").value, 10);
+            let regularValue = parseInt(document.getElementById("regularValue").value, 10);
+            let resetValue = parseInt(document.getElementById("resetValue").value, 10);
+            let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
+            let data = document.getElementById("dataInput").value.trim().split('\n');
+            let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = "";
+            let total = 0;
+            let advantageousZone = 0;
+
+            data.forEach((line, index) => {
+                let [time, bonus, spins] = line.split('\t');
+                spins = parseInt(spins, 10);
+                total += spins;
+
+                advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
+
+                let row = tableBody.insertRow();
+                row.insertCell(0).innerText = time;
+                row.insertCell(1).innerText = bonus;
+                row.insertCell(2).innerText = spins;
+                row.insertCell(3).innerText = total;
+                row.insertCell(4).innerText = advantageousZone;
+
+                if (advantageousZone > resetValue && (index + 1 < data.length && parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold)) {
+                    advantageousZone = 0;
+                    row.classList.add('reset');
+                }
+
+                if (bonus === 'ビッグ') {
+                    row.classList.add('big');
+                } else if (bonus === 'レギュラー') {
+                    row.classList.add('regular');
+                }
+            });
+        }
+
+        function exportToPNG() {
+            html2canvas(document.getElementById('dataTable')).then(canvas => {
+                let link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'table.png';
+                link.click();
+            });
+        }
+    </script>
+
+<script>
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 500) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+</script>
+
+<script>
+document.getElementById('number-pad').addEventListener('touchstart', function(event) {
+  if (event.target.classList.contains('number-button')) {
+    handleTouch(event);
+  }
+}, { passive: true });
+</script>
+
 </body>
 </html>
