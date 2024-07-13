@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
-    <title>沖ドキ！BLACK有利チェッカー</title>
+    <title>沖ドキ！BLACK&GOLD有利チェッカー</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 20px;
             background-color: #1c1c1c;
             color: #f0f0f0;
@@ -49,10 +48,10 @@
             background-color: #555;
         }
         .big {
-            background-color: #8b0000; /* 赤っぽい色 */
+            background-color: #ff1732; /* 赤っぽい色 */
         }
         .regular {
-            background-color: #00008b; /* 青っぽい色 */
+            background-color: #1764ff; /* 青っぽい色 */
         }
 	/* その他の行の背景色 */
 	.dark-theme {
@@ -64,7 +63,7 @@
         }
 	/* リセット値に到達した行の背景色 */
 	.reset-zone {
-            background-color: #AA8200; /* 黄色っぽい色 */
+            background-color: #ffc117; /* 黄色っぽい色 */
 	}
         .settings {
             margin-top: 20px;
@@ -93,16 +92,19 @@
     margin: 5px;
     font-size: 12px;
 }
-#input-field {
-    width: 100%;
-    height: 40px;
-    font-size: 12px;
-    margin-bottom: 10px;
-    background-color: #2b2b2b;
-    color: #f0f0f0;
-    border: 1px solid #444;
-    padding: 5px;
-}
+        #input-field {
+            width: 100%;
+            max-width: 200px; /* 最大幅を設定 */
+            height: 30px;
+            font-size: 16px;
+            margin: 10px auto; /* 上下のマージンを追加し、左右を自動に設定してセンタリング */
+            background-color: #2b2b2b;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            padding: 5px;
+            box-sizing: border-box;
+            display: block; /* ブロック要素として表示 */
+        }
 /* 非アクティブ時のスタイル */
 #reverse-toggle {
     background-color: #333;
@@ -124,41 +126,66 @@
     transition: background-color 0.3s, box-shadow 0.3s; /* なめらかなトランジション */
 }
 
+/* ボタンの基本スタイル */
+#touch-panel button {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+}
+
+/* クリック（アクティブ）効果 */
+#touch-panel button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 光るエフェクト */
+#touch-panel button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255,255,255,.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+#touch-panel button:active::after {
+    animation: ripple 0.6s ease-out;
+}
+
+/* 特定のボタンの色 */
+#big-btn:active::after { background: rgba(255,0,0,.5); }
+#regular-btn:active::after { background: rgba(0,0,255,.5); }
+.num-btn:active::after { background: rgba(0,255,0,.5); }
+.op-btn:nth-child(4n):active::after { background: rgba(128,0,128,.5); } /* = ボタン */
+.op-btn:nth-child(4n-1):active::after { background: rgba(255,255,0,.5); } /* + ボタン */
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 1;
+    }
+    20% {
+        transform: scale(25, 25);
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
     </style>
 </head>
 <body>
-<input type="text" id="input-field" readonly>
-<div id="touch-panel">
-  <div class="row">
-    <button class="num-btn">7</button>
-    <button class="num-btn">8</button>
-    <button class="num-btn">9</button>
-  </div>
-  <div class="row">
-    <button class="num-btn">4</button>
-    <button class="num-btn">5</button>
-    <button class="num-btn">6</button>
-  </div>
-  <div class="row">
-    <button class="num-btn">1</button>
-    <button class="num-btn">2</button>
-    <button class="num-btn">3</button>
-  </div>
-  <div class="row">
-    <button class="num-btn">0</button>
-    <button id="del-btn">DEL</button>
-    <button id="bs-btn">BS</button>
-  </div>
-  <div class="row">
-    <button id="big-btn">ビッグ</button>
-    <button id="regular-btn">レギュラー</button>
-    <button id="current-btn">現在</button>
-  </div>
-  <div class="row">
-    <button id="reverse-toggle">逆順</button>
-  </div>
 
-</div>
 
 
     <h1>データ入力ページ</h1>
@@ -178,9 +205,9 @@
         <label for="regularValue">レギュラー:</label>
         <input type="number" id="regularValue" value="24">
         <label for="resetValue">リセット値:</label>
-        <input type="number" id="resetValue" value="1600">
+        <input type="number" id="resetValue" value="1700">
         <label for="spinThreshold">リセしない回転数:</label>
-        <input type="number" id="spinThreshold" value="31">
+        <input type="number" id="spinThreshold" value="32">
 	<label><input type="checkbox" id="gameBasedCalculation" checked>当選ゲーム数で計算</label>
     </div>
     <table id="dataTable">
@@ -196,6 +223,55 @@
         <tbody>
         </tbody>
     </table>
+
+
+<input type="text" id="input-field" readonly>
+
+
+<div id="touch-panel">
+  <div class="row">
+    <button class="num-btn">7</button>
+    <button class="num-btn">8</button>
+    <button class="num-btn">9</button>
+    <button class="op-btn">÷</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">4</button>
+    <button class="num-btn">5</button>
+    <button class="num-btn">6</button>
+    <button class="op-btn">×</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">1</button>
+    <button class="num-btn">2</button>
+    <button class="num-btn">3</button>
+    <button class="op-btn">-</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">0</button>
+    <button class="num-btn">.</button>
+    <button class="op-btn">=</button>
+    <button class="op-btn">+</button>
+  </div>
+  <div class="row">
+    <button id="ac-btn">AC</button>
+    <button id="c-btn">BS</button>
+    <button id="percent-btn">%</button>
+    <button id="plus-minus-btn">±</button>
+  </div>
+  <div class="row">
+    <button id="big-btn">ビッグ</button>
+    <button id="regular-btn">レギュラー</button>
+    <button id="current-btn">現在</button>
+  </div>
+  <div class="row">
+    <button id="reverse-toggle">逆順</button>
+    <button id="del-btn">DEL</button>
+    <button id="clear-btn">全消し</button>
+  </div>
+</div>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 
@@ -203,39 +279,70 @@
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById('input-field');
     const numButtons = document.querySelectorAll('.num-btn');
-    const bsButton = document.getElementById('bs-btn');
+    const opButtons = document.querySelectorAll('.op-btn');
+    const acButton = document.getElementById('ac-btn');
+    const cButton = document.getElementById('c-btn');
     const delButton = document.getElementById('del-btn');
+    const clearAllButton = document.getElementById('clear-btn');
+    const percentButton = document.getElementById('percent-btn');
+    const plusMinusButton = document.getElementById('plus-minus-btn');
     const bigButton = document.getElementById('big-btn');
     const regularButton = document.getElementById('regular-btn');
     const reverseToggle = document.getElementById('reverse-toggle');
-    const currentButton = document.getElementById('current-btn'); // New button
+    const currentButton = document.getElementById('current-btn');
     const dataInput = document.getElementById('dataInput');
     let isReverse = false;
+    let currentCalc = '';
 
     // 数字ボタンの処理
     numButtons.forEach(button => {
         button.addEventListener('click', function() {
             inputField.value += this.textContent;
+            currentCalc += this.textContent;
         });
     });
 
-    // バックスペースボタンの処理
-    bsButton.addEventListener('click', function() {
-        inputField.value = inputField.value.slice(0, -1);
+    // 演算子ボタンの処理
+    opButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.textContent === '=') {
+                try {
+                    currentCalc = currentCalc.replace(/×/g, '*').replace(/÷/g, '/');
+                    inputField.value = eval(currentCalc);
+                    currentCalc = inputField.value;
+                } catch (e) {
+                    inputField.value = 'Error';
+                    currentCalc = '';
+                }
+            } else {
+                inputField.value += this.textContent;
+                currentCalc += this.textContent;
+            }
+        });
     });
 
-    // DELボタンの処理
-    delButton.addEventListener('click', function() {
-        let data = dataInput.value.trim().split('\n');
-        if (data.length > 0) {
-            if (isReverse) {
-                data.shift(); // 逆順モードの場合、最初の要素を削除
-            } else {
-                data.pop(); // 通常モードの場合、最後の要素を削除
-            }
-            dataInput.value = data.join('\n');
-            calculateTotals(); // データが変更されたので、総計を再計算
-        }
+    // ACボタンの処理
+    acButton.addEventListener('click', function() {
+        inputField.value = '';
+        currentCalc = '';
+    });
+
+    // Cボタンの処理
+    cButton.addEventListener('click', function() {
+        inputField.value = inputField.value.slice(0, -1);
+        currentCalc = currentCalc.slice(0, -1);
+    });
+
+    // %ボタンの処理
+    percentButton.addEventListener('click', function() {
+        inputField.value = parseFloat(inputField.value) / 100;
+        currentCalc = inputField.value;
+    });
+
+    // ±ボタンの処理
+    plusMinusButton.addEventListener('click', function() {
+        inputField.value = -parseFloat(inputField.value);
+        currentCalc = inputField.value;
     });
 
     // トグルボタンの処理
@@ -259,6 +366,30 @@ document.addEventListener('DOMContentLoaded', function() {
         registerCurrentInput();
     });
 
+    // DELボタンの処理
+    delButton.addEventListener('click', function() {
+        let data = dataInput.value.trim().split('\n');
+        if (data.length > 0) {
+            if (isReverse) {
+                data.shift(); // 逆順モードの場合、最初の要素を削除
+            } else {
+                data.pop(); // 通常モードの場合、最後の要素を削除
+            }
+            dataInput.value = data.join('\n');
+            calculateTotals(); // データが変更されたので、総計を再計算
+        }
+    });
+
+// 全消しボタンの処理
+clearAllButton.addEventListener('click', function() {
+    if (confirm('本当にすべてのデータを消去しますか？')) {
+        dataInput.value = ''; // テキストエリアの内容を空にする
+        inputField.value = ''; // 入力フィールドも空にする
+        currentCalc = ''; // 現在の計算をリセット
+        calculateTotals(); // テーブルを更新
+    }
+});
+
     function addEntry(bonusType) {
         const now = new Date();
         const time = now.toLocaleTimeString();
@@ -279,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function registerCurrentInput() {
         const spins = inputField.value || '0';
-        const newEntry = `現在\t入力\t${spins}`;
+        const newEntry = `現在\t-\t${spins}`;
         let data = dataInput.value.trim().split('\n');
 
         if (isReverse) {
@@ -306,8 +437,8 @@ document.addEventListener('DOMContentLoaded', function() {
         function black() {
             document.getElementById("bigValue").value = "59";
             document.getElementById("regularValue").value = "24";
-            document.getElementById("resetValue").value = "1600";
-            document.getElementById("spinThreshold").value = "31";
+            document.getElementById("resetValue").value = "1700";
+            document.getElementById("spinThreshold").value = "32";
             calculateTotals(); // 設定変更後に再計算
         }
 
@@ -380,7 +511,7 @@ function calculateTotals() {
     // 当選ゲーム数で計算が有効な場合、データ配列の最初に新しい行を追加
     if (gameBasedCalculation) {
         // 追加する行のデータを定義
-        let additionalRowData = "現在\t入力\t0";
+        let additionalRowData = "現在\t-\t0";
 
         // データ配列の最初に追加
         data.unshift(additionalRowData);
