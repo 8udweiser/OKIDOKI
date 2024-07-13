@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
+    <title>沖ドキ！BLACK有利チェッカー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+	    font-size: 12px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            background-color: #2b2b2b;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: white; /* テーブル全体のテキスト色を白に設定 */
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+        }
+        .button-group {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #444;
+            color: #f0f0f0;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        .big {
+            background-color: #8b0000; /* 赤っぽい色 */
+        }
+        .regular {
+            background-color: #00008b; /* 青っぽい色 */
+        }
+	/* その他の行の背景色 */
+	.dark-theme {
+	    background-color: #2F2F2F; /* ダークスレートグレー */
+	    color: #FFFFFF; /* 白色のテキスト */
+	}
+        .reset {
+            background-color: #AA8200; /* 黄色っぽい色 */
+        }
+	/* リセット値に到達した行の背景色 */
+	.reset-zone {
+            background-color: #AA8200; /* 黄色っぽい色 */
+	}
+        .settings {
+            margin-top: 20px;
+        }
+        .settings label {
+            margin-right: 10px;
+        }
+        .settings input {
+            width: 50px;
+            margin-right: 20px;
+        }
+#touch-panel {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
+    margin: 20px auto;
+    touch-action: none; /* この行を追加してピンチイン・ピンチアウトを無効にする */
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+#touch-panel button {
+    width: 30%;
+    height: 50px;
+    margin: 5px;
+    font-size: 12px;
+}
+        #input-field {
+            width: 100%;
+            max-width: 200px; /* 最大幅を設定 */
+            height: 30px;
+            font-size: 16px;
+            margin: 10px auto; /* 上下のマージンを追加し、左右を自動に設定してセンタリング */
+            background-color: #2b2b2b;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            padding: 5px;
+            box-sizing: border-box;
+            display: block; /* ブロック要素として表示 */
+        }
+/* 非アクティブ時のスタイル */
+#reverse-toggle {
+    background-color: #333;
+    color: #FFF;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s; /* アクティブ時のトランジションを追加 */
+}
+
+/* アクティブ時のスタイル */
+#reverse-toggle.active {
+    background-color: #007BFF; /* 青色 */
+    color: #FFFFFF; /* 白色のテキスト */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7), 0 0 20px rgba(0, 123, 255, 0.5), 0 0 30px rgba(0, 123, 255, 0.3);
+    border: none; /* ボーダーをなくす */
+    outline: none; /* アウトラインをなくす */
+    transition: background-color 0.3s, box-shadow 0.3s; /* なめらかなトランジション */
+}
+
+    </style>
+</head>
+<body>
+<div id="touch-panel">
+  <div class="row">
+    <button class="num-btn">7</button>
+    <button class="num-btn">8</button>
+    <button class="num-btn">9</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">4</button>
+    <button class="num-btn">5</button>
+    <button class="num-btn">6</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">1</button>
+    <button class="num-btn">2</button>
+    <button class="num-btn">3</button>
+  </div>
+  <div class="row">
+    <button class="num-btn">0</button>
+    <button id="del-btn">DEL</button>
+    <button id="bs-btn">BS</button>
+  </div>
+  <div class="row">
+    <button id="big-btn">ビッグ</button>
+    <button id="regular-btn">レギュラー</button>
+    <button id="current-btn">現在</button>
+  </div>
+  <div class="row">
+    <button id="reverse-toggle">逆順</button>
+  </div>
+</div>
+
+<input type="text" id="input-field" readonly>
+
+
+    <h1>データ入力ページ</h1>
+    <textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
+    <div class="button-group">
+        <button onclick="sortData()">データを並び替え</button>
+        <button onclick="replaceOrRemove()">回を消去</button>
+        <button onclick="calculateTotals()">総回転数を計算</button>
+        <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
+	<button onclick="displayTableAsImage()">テーブルを画像として表示</button>
+	<button onclick="gold()">GOLD</button>
+	<button onclick="black()">BLACK</button>
+    </div>
+    <div class="settings">
+        <label for="bigValue">ビッグ:</label>
+        <input type="number" id="bigValue" value="59">
+        <label for="regularValue">レギュラー:</label>
+        <input type="number" id="regularValue" value="24">
+        <label for="resetValue">リセット値:</label>
+        <input type="number" id="resetValue" value="1600">
+        <label for="spinThreshold">リセしない回転数:</label>
+        <input type="number" id="spinThreshold" value="32">
+	<label><input type="checkbox" id="gameBasedCalculation" checked>当選ゲーム数で計算</label>
+    </div>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>時間</th>
+                <th>ボーナス</th>
+                <th>回転数</th>
+                <th>総回転数</th>
+                <th>有利区間</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputField = document.getElementById('input-field');
+    const numButtons = document.querySelectorAll('.num-btn');
+    const bsButton = document.getElementById('bs-btn');
+    const delButton = document.getElementById('del-btn');
+    const bigButton = document.getElementById('big-btn');
+    const regularButton = document.getElementById('regular-btn');
+    const reverseToggle = document.getElementById('reverse-toggle');
+    const currentButton = document.getElementById('current-btn'); // New button
+    const dataInput = document.getElementById('dataInput');
+    let isReverse = false;
+
+    // 数字ボタンの処理
+    numButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            inputField.value += this.textContent;
+        });
+    });
+
+    // バックスペースボタンの処理
+    bsButton.addEventListener('click', function() {
+        inputField.value = inputField.value.slice(0, -1);
+    });
+
+    // DELボタンの処理
+    delButton.addEventListener('click', function() {
+        let data = dataInput.value.trim().split('\n');
+        if (data.length > 0) {
+            if (isReverse) {
+                data.shift(); // 逆順モードの場合、最初の要素を削除
+            } else {
+                data.pop(); // 通常モードの場合、最後の要素を削除
+            }
+            dataInput.value = data.join('\n');
+            calculateTotals(); // データが変更されたので、総計を再計算
+        }
+    });
+
+    // トグルボタンの処理
+    reverseToggle.addEventListener('click', function() {
+        isReverse = !isReverse;
+        this.classList.toggle('active', isReverse);
+    });
+
+    // ビッグボタンの処理
+    bigButton.addEventListener('click', function() {
+        addEntry('ビッグ');
+    });
+
+    // レギュラーボタンの処理
+    regularButton.addEventListener('click', function() {
+        addEntry('レギュラー');
+    });
+
+    // 現在ボタンの処理
+    currentButton.addEventListener('click', function() {
+        registerCurrentInput();
+    });
+
+    function addEntry(bonusType) {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const spins = inputField.value || '0';
+        const newEntry = `${time}\t${bonusType}\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+        
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
+        }
+        
+        dataInput.value = data.join('\n');
+        inputField.value = '';
+        calculateTotals();
+    }
+
+    function registerCurrentInput() {
+        const spins = inputField.value || '0';
+        const newEntry = `現在\t-\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
+        }
+
+        dataInput.value = data.join('\n');
+        inputField.value = '';
+        calculateTotals();
+    }
+});
+
+
+        function gold() {
+            document.getElementById("bigValue").value = "69";
+            document.getElementById("regularValue").value = "29";
+            document.getElementById("resetValue").value = "2000";
+            document.getElementById("spinThreshold").value = "32";
+            calculateTotals(); // 設定変更後に再計算
+        }
+
+        function black() {
+            document.getElementById("bigValue").value = "59";
+            document.getElementById("regularValue").value = "24";
+            document.getElementById("resetValue").value = "1700";
+            document.getElementById("spinThreshold").value = "32";
+            calculateTotals(); // 設定変更後に再計算
+        }
+
+
+</script>
+
+
+<script>
+function displayTableAsImage() {
+    html2canvas(document.getElementById('dataTable')).then(canvas => {
+        // キャンバスを画像データURLに変換
+        const imageDataUrl = canvas.toDataURL('image/png');
+
+        // 新しいウィンドウを開く
+        const newWindow = window.open('', '_blank');
+
+        // 新しいウィンドウにHTMLを書き込む
+        newWindow.document.write(`
+            <html>
+            <head>
+                <title>テーブル画像</title>
+                <style>
+                    body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f0f0; }
+                    img { max-width: 100%; height: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+                </style>
+            </head>
+            <body>
+                <img src="${imageDataUrl}" alt="テーブル画像">
+            </body>
+            </html>
+        `);
+
+        // 新しいウィンドウのドキュメントを閉じる（重要）
+        newWindow.document.close();
+    });
+}
+</script>
+
+
+    <script>
+        function sortData() {
+            let data = document.getElementById("dataInput").value.trim().split('\n');
+            data.sort((a, b) => {
+                let timeA = a.split('\t')[0];
+                let timeB = b.split('\t')[0];
+                return timeA.localeCompare(timeB);
+            });
+            document.getElementById("dataInput").value = data.join('\n');
+        }
+
+        function replaceOrRemove() {
+            let data = document.getElementById("dataInput").value;
+            data = data.replace(/回/g, '');
+            document.getElementById("dataInput").value = data;
+        }
+
+function calculateTotals() {
+    let bigValue = parseInt(document.getElementById("bigValue").value, 10);
+    let regularValue = parseInt(document.getElementById("regularValue").value, 10);
+    let resetValue = parseInt(document.getElementById("resetValue").value, 10);
+    let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
+    let gameBasedCalculation = document.getElementById("gameBasedCalculation").checked; // チェックボックスの状態を取得
+    let data = document.getElementById("dataInput").value.trim().split('\n');
+    let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = "";
+    let total = 0;
+    let advantageousZone = 0;
+    let previousBonus = ''; // 前のボーナスを保持する変数
+
+    // 当選ゲーム数で計算が有効な場合、データ配列の最初に新しい行を追加
+    if (gameBasedCalculation) {
+        // 追加する行のデータを定義
+        let additionalRowData = "現在\t-\t0";
+
+        // データ配列の最初に追加
+        data.unshift(additionalRowData);
+    }
+
+    data.forEach((line, index) => {
+        let [time, bonus, spins] = line.split('\t');
+        spins = parseInt(spins, 10);
+        total += spins;
+
+        // 有利ゾーンの計算
+        if (gameBasedCalculation && previousBonus) {
+            advantageousZone += spins + (previousBonus === 'ビッグ' ? bigValue : previousBonus === 'レギュラー' ? regularValue : 0);
+        } else {
+            advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
+        }
+
+        // 新しい行をテーブルに挿入します。
+        let row = tableBody.insertRow();
+        row.insertCell(0).innerText = time;
+        row.insertCell(1).innerText = bonus;
+        row.insertCell(2).innerText = spins;
+        row.insertCell(3).innerText = total;
+        row.insertCell(4).innerText = advantageousZone;
+
+        // 行にクラスを追加して色を変更
+        if (bonus === 'ビッグ') {
+            row.classList.add('big');
+        } else if (bonus === 'レギュラー') {
+            row.classList.add('regular');
+        } else {
+            row.classList.add('dark-theme');
+        }
+
+        // 有利区間の合計がリセット値に到達している場合、行の色を変更
+        if (advantageousZone > resetValue) {
+            row.classList.add('reset-zone');
+        }
+
+        // リセット条件をチェック
+        if (advantageousZone > resetValue && (index + 1 < data.length && parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold)) {
+            advantageousZone = 0;
+            row.classList.add('reset');
+        }
+
+        // 現在のボーナスを previousBonus に設定
+        previousBonus = bonus;
+    });
+}
+
+
+
+
+        function exportToPNG() {
+            html2canvas(document.getElementById('dataTable')).then(canvas => {
+                let link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'table.png';
+                link.click();
+            });
+        }
+    </script><script>
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 0) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+</script>
+</body>
+</html>
