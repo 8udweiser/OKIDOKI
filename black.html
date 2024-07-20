@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
-    <title>沖ドキ！BLACK&GOLD有利チェッカー</title>
+    <title>沖ドキ！BLACK & GOLD 有利チェッカー</title>
     <style>
         body {
             margin: 20px;
@@ -105,6 +105,18 @@
             box-sizing: border-box;
             display: block; /* ブロック要素として表示 */
         }
+		
+		
+		
+    #big-btn {
+        background-color: #ff1732; /* ビッグボタンの色 */
+    }
+    #regular-btn {
+        background-color: #1764ff; /* レギュラーボタンの色 */
+    }
+	
+
+		
 /* 非アクティブ時のスタイル */
 #reverse-toggle {
     background-color: #333;
@@ -160,12 +172,77 @@
     animation: ripple 0.6s ease-out;
 }
 
-/* 特定のボタンの色 */
-#big-btn:active::after { background: rgba(255,0,0,.5); }
-#regular-btn:active::after { background: rgba(0,0,255,.5); }
-.num-btn:active::after { background: rgba(0,255,0,.5); }
-.op-btn:nth-child(4n):active::after { background: rgba(128,0,128,.5); } /* = ボタン */
-.op-btn:nth-child(4n-1):active::after { background: rgba(255,255,0,.5); } /* + ボタン */
+
+
+    /* 特定のボタンの色 */
+    #big-btn:active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 0, 255, 0.7); /* ビッグボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(255, 23, 50, 0.7), 0 0 30px rgba(255, 23, 50, 0.7);
+        border-radius: inherit;
+    }
+    #regular-btn:active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 0, 255, 0.7); /* レギュラーボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(23, 100, 255, 0.7), 0 0 30px rgba(23, 100, 255, 0.7);
+        border-radius: inherit;
+    }
+    #current-btn:active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 0, 255, 0.7); /* 現在ボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 30px rgba(255, 0, 255, 0.7);
+        border-radius: inherit;
+    }
+    .num-btn:active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 255, 0, 0.7); /* 数字ボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.7), 0 0 30px rgba(0, 255, 0, 0.7);
+        border-radius: inherit;
+    }
+    .op-btn:nth-child(4n):active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(128, 0, 128, 0.7); /* = ボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(128, 0, 128, 0.7), 0 0 30px rgba(128, 0, 128, 0.7);
+        border-radius: inherit;
+    }
+    .op-btn:nth-child(4n-1):active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 0, 0.7); /* + ボタンのエフェクト */
+        box-shadow: 0 0 15px rgba(255, 255, 0, 0.7), 0 0 30px rgba(255, 255, 0, 0.7);
+        border-radius: inherit;
+    }
+
+
 
 @keyframes ripple {
     0% {
@@ -208,21 +285,26 @@
         <input type="number" id="resetValue" value="1700">
         <label for="spinThreshold">リセしない回転数:</label>
         <input type="number" id="spinThreshold" value="32">
+		<label for="maxValue">上限値:</label>
+		<input type="number" id="maxValue" name="maxValue" value="1000">
+
 	<label><input type="checkbox" id="gameBasedCalculation" checked>当選ゲーム数で計算</label>
     </div>
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>時間</th>
-                <th>ボーナス</th>
-                <th>回転数</th>
-                <th>総回転数</th>
-                <th>有利区間</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>時間</th>
+            <th>ボーナス</th>
+            <th>回転数</th>
+            <th>総回転数</th>
+            <th>有利区間</th>
+            <th>連荘数</th> <!-- New column for 連荘数 -->
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
 
 
 <input type="text" id="input-field" readonly>
@@ -266,7 +348,7 @@
   </div>
   <div class="row">
     <button id="reverse-toggle">逆順</button>
-    <button id="del-btn">DEL</button>
+    <button id="del-btn">1行削除</button>
     <button id="clear-btn">全消し</button>
   </div>
 </div>
@@ -291,14 +373,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const reverseToggle = document.getElementById('reverse-toggle');
     const currentButton = document.getElementById('current-btn');
     const dataInput = document.getElementById('dataInput');
+    const maxValueInput = document.getElementById('maxValue');
     let isReverse = false;
     let currentCalc = '';
+
+    // 初期上限値
+    let MAX_VALUE = parseInt(maxValueInput.value) || 1000;
+
+    // maxValueInputの変更イベントリスナー
+    maxValueInput.addEventListener('input', function() {
+        MAX_VALUE = parseInt(this.value);
+        // 0が入力された場合、上限なしとして扱う
+        if (MAX_VALUE === 0) {
+            MAX_VALUE = Infinity;
+        } else if (isNaN(MAX_VALUE)) {
+            MAX_VALUE = 1000; // 数値以外が入力された場合のデフォルト値
+        }
+    });
 
     // 数字ボタンの処理
     numButtons.forEach(button => {
         button.addEventListener('click', function() {
             inputField.value += this.textContent;
             currentCalc += this.textContent;
+            if (MAX_VALUE !== Infinity && parseFloat(inputField.value) > MAX_VALUE) {
+                inputField.value = MAX_VALUE;
+                currentCalc = MAX_VALUE.toString();
+            }
         });
     });
 
@@ -309,6 +410,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     currentCalc = currentCalc.replace(/×/g, '*').replace(/÷/g, '/');
                     inputField.value = eval(currentCalc);
+                    if (MAX_VALUE !== Infinity && parseFloat(inputField.value) > MAX_VALUE) {
+                        inputField.value = MAX_VALUE;
+                    }
                     currentCalc = inputField.value;
                 } catch (e) {
                     inputField.value = 'Error';
@@ -320,6 +424,54 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // ... (以下のコードも同様に MAX_VALUE !== Infinity の条件を追加)
+
+    function addEntry(bonusType) {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        let spins = parseInt(inputField.value) || 0;
+        
+        // 上限値チェック（上限なしの場合はチェックしない）
+        if (MAX_VALUE !== Infinity) {
+            spins = Math.min(spins, MAX_VALUE);
+        }
+        
+        const newEntry = `${time}\t${bonusType}\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+        
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
+        }
+        
+        dataInput.value = data.join('\n');
+        inputField.value = '';
+        calculateTotals();
+    }
+
+    function registerCurrentInput() {
+        let spins = parseInt(inputField.value) || 0;
+        
+        // 上限値チェック（上限なしの場合はチェックしない）
+        if (MAX_VALUE !== Infinity) {
+            spins = Math.min(spins, MAX_VALUE);
+        }
+        
+        const newEntry = `現在\t-\t${spins}`;
+        let data = dataInput.value.trim().split('\n');
+
+        if (isReverse) {
+            data.unshift(newEntry);
+        } else {
+            data.push(newEntry);
+        }
+
+        dataInput.value = data.join('\n');
+        inputField.value = '';
+        calculateTotals();
+    }
 
     // ACボタンの処理
     acButton.addEventListener('click', function() {
@@ -351,21 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('active', isReverse);
     });
 
-    // ビッグボタンの処理
-    bigButton.addEventListener('click', function() {
-        addEntry('ビッグ');
-    });
-
-    // レギュラーボタンの処理
-    regularButton.addEventListener('click', function() {
-        addEntry('レギュラー');
-    });
-
-    // 現在ボタンの処理
-    currentButton.addEventListener('click', function() {
-        registerCurrentInput();
-    });
-
     // DELボタンの処理
     delButton.addEventListener('click', function() {
         let data = dataInput.value.trim().split('\n');
@@ -380,20 +517,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-// 全消しボタンの処理
-clearAllButton.addEventListener('click', function() {
-    if (confirm('本当にすべてのデータを消去しますか？')) {
-        dataInput.value = ''; // テキストエリアの内容を空にする
-        inputField.value = ''; // 入力フィールドも空にする
-        currentCalc = ''; // 現在の計算をリセット
-        calculateTotals(); // テーブルを更新
-    }
-});
+    // 全消しボタンの処理
+    clearAllButton.addEventListener('click', function() {
+        if (confirm('本当にすべてのデータを消去しますか?')) {
+            dataInput.value = ''; // テキストエリアの内容を空にする
+            inputField.value = ''; // 入力フィールドも空にする
+            currentCalc = ''; // 現在の計算をリセット
+            calculateTotals(); // テーブルを更新
+        }
+    });
 
     function addEntry(bonusType) {
         const now = new Date();
         const time = now.toLocaleTimeString();
-        const spins = inputField.value || '0';
+        let spins = parseInt(inputField.value) || 0;
+        
+        // 上限値チェック
+        spins = Math.min(spins, MAX_VALUE);
+        
         const newEntry = `${time}\t${bonusType}\t${spins}`;
         let data = dataInput.value.trim().split('\n');
         
@@ -409,7 +550,11 @@ clearAllButton.addEventListener('click', function() {
     }
 
     function registerCurrentInput() {
-        const spins = inputField.value || '0';
+        let spins = parseInt(inputField.value) || 0;
+        
+        // 上限値チェック
+        spins = Math.min(spins, MAX_VALUE);
+        
         const newEntry = `現在\t-\t${spins}`;
         let data = dataInput.value.trim().split('\n');
 
@@ -423,25 +568,52 @@ clearAllButton.addEventListener('click', function() {
         inputField.value = '';
         calculateTotals();
     }
+
+    // ビッグボタンの処理
+    bigButton.addEventListener('click', function(event) {
+        event.preventDefault(); // デフォルトの動作を防止
+        addEntry('ビッグ');
+        scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
+    });
+
+    // レギュラーボタンの処理
+    regularButton.addEventListener('click', function(event) {
+        event.preventDefault(); // デフォルトの動作を防止
+        addEntry('レギュラー');
+        scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
+    });
+
+    // 現在ボタンの処理
+    currentButton.addEventListener('click', function(event) {
+        event.preventDefault(); // デフォルトの動作を防止
+        registerCurrentInput();
+        scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
+    });
+
+    function scrollToLastEntry() {
+        const table = document.querySelector('table'); // テーブルを選択
+        const lastRow = table.rows[table.rows.length - 2]; // 最終行を選択
+        if (lastRow) {
+            lastRow.scrollIntoView({ behavior: 'smooth' }); // 最終行までスムーズにスクロール
+        }
+    }
 });
 
+    function gold() {
+        document.getElementById("bigValue").value = "69";
+        document.getElementById("regularValue").value = "29";
+        document.getElementById("resetValue").value = "2000";
+        document.getElementById("spinThreshold").value = "32";
+        calculateTotals(); // 設定変更後に再計算
+    }
 
-        function gold() {
-            document.getElementById("bigValue").value = "69";
-            document.getElementById("regularValue").value = "29";
-            document.getElementById("resetValue").value = "2000";
-            document.getElementById("spinThreshold").value = "32";
-            calculateTotals(); // 設定変更後に再計算
-        }
-
-        function black() {
-            document.getElementById("bigValue").value = "59";
-            document.getElementById("regularValue").value = "24";
-            document.getElementById("resetValue").value = "1700";
-            document.getElementById("spinThreshold").value = "32";
-            calculateTotals(); // 設定変更後に再計算
-        }
-
+    function black() {
+        document.getElementById("bigValue").value = "59";
+        document.getElementById("regularValue").value = "24";
+        document.getElementById("resetValue").value = "1700";
+        document.getElementById("spinThreshold").value = "32";
+        calculateTotals(); // 設定変更後に再計算
+    }
 
 </script>
 
@@ -495,72 +667,71 @@ function displayTableAsImage() {
             document.getElementById("dataInput").value = data;
         }
 
-function calculateTotals() {
-    let bigValue = parseInt(document.getElementById("bigValue").value, 10);
-    let regularValue = parseInt(document.getElementById("regularValue").value, 10);
-    let resetValue = parseInt(document.getElementById("resetValue").value, 10);
-    let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
-    let gameBasedCalculation = document.getElementById("gameBasedCalculation").checked; // チェックボックスの状態を取得
-    let data = document.getElementById("dataInput").value.trim().split('\n');
-    let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = "";
-    let total = 0;
-    let advantageousZone = 0;
-    let previousBonus = ''; // 前のボーナスを保持する変数
+        function calculateTotals() {
+            let bigValue = parseInt(document.getElementById("bigValue").value, 10);
+            let regularValue = parseInt(document.getElementById("regularValue").value, 10);
+            let resetValue = parseInt(document.getElementById("resetValue").value, 10);
+            let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
+            let gameBasedCalculation = document.getElementById("gameBasedCalculation").checked;
+            let maxValue = parseInt(document.getElementById("maxValue").value, 10) || Infinity; // 上限値を取得
+            let data = document.getElementById("dataInput").value.trim().split('\n');
+            let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = "";
+            let total = 0;
+            let advantageousZone = 0;
+            let consecutiveWins = 0;
+            let lastSpin = null;
 
-    // 当選ゲーム数で計算が有効な場合、データ配列の最初に新しい行を追加
-    if (gameBasedCalculation) {
-        // 追加する行のデータを定義
-        let additionalRowData = "現在\t-\t0";
+            if (gameBasedCalculation) {
+                let additionalRowData = "現在\t-\t0";
+                data.unshift(additionalRowData);
+            }
 
-        // データ配列の最初に追加
-        data.unshift(additionalRowData);
-    }
+            data.forEach((line, index) => {
+                let [time, bonus, spins] = line.split('\t');
+                spins = Math.min(parseInt(spins, 10), maxValue); // 上限値を適用
+                total += spins;
 
-    data.forEach((line, index) => {
-        let [time, bonus, spins] = line.split('\t');
-        spins = parseInt(spins, 10);
-        total += spins;
+                if (gameBasedCalculation && lastSpin !== null) {
+                    advantageousZone += spins + (lastSpin === 'ビッグ' ? bigValue : lastSpin === 'レギュラー' ? regularValue : 0);
+                } else {
+                    advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
+                }
 
-        // 有利ゾーンの計算
-        if (gameBasedCalculation && previousBonus) {
-            advantageousZone += spins + (previousBonus === 'ビッグ' ? bigValue : previousBonus === 'レギュラー' ? regularValue : 0);
-        } else {
-            advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
+                if (lastSpin !== null && spins <= spinThreshold) {
+                    consecutiveWins++;
+                } else {
+                    consecutiveWins = 1;
+                }
+
+                let row = tableBody.insertRow();
+                row.insertCell(0).innerText = time;
+                row.insertCell(1).innerText = bonus;
+                row.insertCell(2).innerText = spins;
+                row.insertCell(3).innerText = total;
+                row.insertCell(4).innerText = advantageousZone;
+                row.insertCell(5).innerText = (consecutiveWins === 1) ? '' : consecutiveWins;  // 連荘数の表示
+
+                if (bonus === 'ビッグ') {
+                    row.classList.add('big');
+                } else if (bonus === 'レギュラー') {
+                    row.classList.add('regular');
+                } else {
+                    row.classList.add('dark-theme');
+                }
+
+                if (advantageousZone > resetValue) {
+                    row.classList.add('reset-zone');
+                }
+
+                if (advantageousZone > resetValue && (index + 1 < data.length && parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold)) {
+                    advantageousZone = 0;
+                    row.classList.add('reset');
+                }
+
+                lastSpin = bonus;
+            });
         }
-
-        // 新しい行をテーブルに挿入します。
-        let row = tableBody.insertRow();
-        row.insertCell(0).innerText = time;
-        row.insertCell(1).innerText = bonus;
-        row.insertCell(2).innerText = spins;
-        row.insertCell(3).innerText = total;
-        row.insertCell(4).innerText = advantageousZone;
-
-        // 行にクラスを追加して色を変更
-        if (bonus === 'ビッグ') {
-            row.classList.add('big');
-        } else if (bonus === 'レギュラー') {
-            row.classList.add('regular');
-        } else {
-            row.classList.add('dark-theme');
-        }
-
-        // 有利区間の合計がリセット値に到達している場合、行の色を変更
-        if (advantageousZone > resetValue) {
-            row.classList.add('reset-zone');
-        }
-
-        // リセット条件をチェック
-        if (advantageousZone > resetValue && (index + 1 < data.length && parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold)) {
-            advantageousZone = 0;
-            row.classList.add('reset');
-        }
-
-        // 現在のボーナスを previousBonus に設定
-        previousBonus = bonus;
-    });
-}
 
 
 
@@ -573,7 +744,8 @@ function calculateTotals() {
                 link.click();
             });
         }
-    </script><script>
+    </script>
+	<script>
     // Prevent zoom on double tap
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(event) {
