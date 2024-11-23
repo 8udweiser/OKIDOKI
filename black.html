@@ -2,14 +2,29 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, minimum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6, user-scalable=yes, maximum-scale=1">
     <title>沖ドキ！BLACK & GOLD 有利チェッカー</title>
+	<meta name="description" content="沖ドキ BLACK/GOLD の有利区間をチェックするためのツールです。回転数やボーナス情報を入力して、有利区間や連荘数を簡単に管理できます。">
+    <meta name="keywords" content="沖ドキ,ブラック,ゴールド,BLACK,GOLD,有利,区間,チェッカー,チェック,ツール,パチスロ,データ管理">
     <style>
         body {
+		    background-color: rgba(28, 28, 28, 0.8); /* 半透明の背景色 */
+            min-width: 1024px;
             margin: 20px;
             background-color: #1c1c1c;
             color: #f0f0f0;
-	    font-size: 12px;
+			font-size: 12px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            justify-content: center;
+        }
+        }
+        .container {
+            width: 100%;
+            max-width: 1792px;
+            padding: 20px;
+            box-sizing: border-box;
         }
         textarea {
             width: 100%;
@@ -26,10 +41,11 @@
             color: white; /* テーブル全体のテキスト色を白に設定 */
         }
         th, td {
-            border: 1px solid #444;
-            padding: 8px;
-            text-align: center;
-        }
+		border: 1px solid #444;
+		padding: 8px;
+		text-align: center;
+		text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* 黒色の縁を追加 */
+		}
         th {
             background-color: #333;
         }
@@ -48,22 +64,29 @@
             background-color: #555;
         }
         .big {
-            background-color: #ff1732; /* 赤っぽい色 */
+            background-color: #e81058; /* 赤っぽい色 */
         }
         .regular {
-            background-color: #1764ff; /* 青っぽい色 */
+            background-color: #1071e8; /* 青っぽい色 */
         }
 	/* その他の行の背景色 */
 	.dark-theme {
 	    background-color: #2F2F2F; /* ダークスレートグレー */
 	    color: #FFFFFF; /* 白色のテキスト */
 	}
-        .reset {
-            background-color: #AA8200; /* 黄色っぽい色 */
-        }
+/* 狙い目に到達した行のスタイル */
+.neraime-zone {
+  font-weight: bold; /* フォントを太字に */
+  color: #1cff5c; /* フォントの色を縁に */
+  text-shadow: 
+    -1px -1px 0 skyblue,
+    1px -1px 0 skyblue,
+    -1px 1px 0 skyblue,
+    1px 1px 0 skyblue; /* フォントの縁を水色に */
+}
 	/* リセット値に到達した行の背景色 */
 	.reset-zone {
-            background-color: #ffc117; /* 黄色っぽい色 */
+            background-color: #1cff5c; /* 緑色っぽい色 */
 	}
         .settings {
             margin-top: 20px;
@@ -75,6 +98,13 @@
             width: 50px;
             margin-right: 20px;
         }
+		
+/* キーボード入力スタイル */
+		.active {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
 #touch-panel {
     display: flex;
     flex-direction: column;
@@ -87,6 +117,7 @@
     justify-content: space-between;
 }
 #touch-panel button {
+    white-space: nowrap;
     width: 30%;
     height: 50px;
     margin: 5px;
@@ -109,10 +140,10 @@
 		
 		
     #big-btn {
-        background-color: #ff1732; /* ビッグボタンの色 */
+        background-color: #e81058; /* ビッグボタンの色 */
     }
     #regular-btn {
-        background-color: #1764ff; /* レギュラーボタンの色 */
+        background-color: #1071e8; /* レギュラーボタンの色 */
     }
 	
 
@@ -258,47 +289,94 @@
         transform: scale(40, 40);
     }
 }
-
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
     </style>
 </head>
 <body>
+<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgvQf5Yaa7FwYQQMAMSxhBNKfdeJtyWwkK8LYn5z6yp3bSNJ_FeGinobl7ITOm6saDkzi8MdLj5f6UwX1Bp8hAC2eF161R7SJkI1Bsr4BZ9Sgi4MQoiWsY3O5jOVO2gVoccA2xeMEOUQj_5mwzkkjU-c-53Wu-dBoctHQ-iYSa0_3uLR7QEmhXPTaYUz_0s/s1600/_425d7f35-744b-46d9-9c7e-d1ddb53e5265.jpg" alt="アイキャッチ画像" style="display: none;">
 
 
 
-    <h1>データ入力ページ</h1>
+
+
+    <h2>データ入力ページ</h2>
     <textarea id="dataInput" placeholder="データを貼り付けてください"></textarea>
     <div class="button-group">
+        <button onclick="calculateTotals()">有利再計算</button>
         <button onclick="sortData()">データを並び替え</button>
         <button onclick="replaceOrRemove()">回を消去</button>
-        <button onclick="calculateTotals()">総回転数を計算</button>
         <button onclick="exportToPNG()">テーブルを画像としてエクスポート</button>
 	<button onclick="displayTableAsImage()">テーブルを画像として表示</button>
-	<button onclick="gold()">GOLD</button>
-	<button onclick="black()">BLACK</button>
+	<button onclick="golda()">GOLD(A)</button>
+	<button onclick="goldb()">GOLD(B)</button>
+	<button onclick="goldc()">GOLD(C)</button>
+	<button onclick="blacka()">BLACK(A)</button>
+	<button onclick="blackb()">BLACK(B)</button>
+	<button onclick="blackc()">BLACK(C)</button>
+	<button onclick="transformDataForOgiya()">teramoba用</button>
+	<button onclick="transformDataForPscube0()">P'sCUBE(差枚無し)用</button>
+	<button onclick="transformDataForPscube1()">P'sCUBE(差枚有り)用</button>
+	<button onclick="transformDataForPdo()">P-DO用</button>
+    <button onclick="copyToClipboard()">コピー</button>
+	<button onclick="clearData()">保存データを削除</button>
+	<div id="copyMessage" style="
+    display:none;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+    z-index: 1000;
+    white-space: nowrap;
+	">
+    クリップボードにコピーしました
+	</div>
+
+
     </div>
     <div class="settings">
         <label for="bigValue">ビッグ:</label>
         <input type="number" id="bigValue" value="59">
+		<input type="number" id="bigMedal" value="213.574847814056">
         <label for="regularValue">レギュラー:</label>
         <input type="number" id="regularValue" value="24">
+		<input type="number" id="regularMedal" value="91.0930950805206">
+		<label for="50Medal">50枚辺りの回転数:</label>
+        <input type="number" id="50Medal" value="31.7991808101357">
         <label for="resetValue">リセット値:</label>
-        <input type="number" id="resetValue" value="1700">
+        <input type="number" id="resetValue" value="2525">
+		<input type="number" id="resetOnConsecutiveWins" value="7" min="1">
+		<label for="resetOnConsecutiveWins">連でリセット</label>
+		<input type="number" id="resetOnPercent" value="51.15" min="40">
+		<label for="resetOnPercent">%以下でリセット</label>
         <label for="spinThreshold">リセしない回転数:</label>
-        <input type="number" id="spinThreshold" value="32">
+        <input type="number" id="spinThreshold" value="100">
 		<label for="maxValue">上限値:</label>
 		<input type="number" id="maxValue" name="maxValue" value="1000">
+		<label for="neraimeValue">狙い目:</label>
+		<input type="number" id="neraimeValue" value="1400">
 
 	<label><input type="checkbox" id="gameBasedCalculation" checked>当選ゲーム数で計算</label>
     </div>
 <table id="dataTable">
     <thead>
         <tr>
-            <th>時間</th>
+            <th>回数</th>
             <th>ボーナス</th>
             <th>回転数</th>
             <th>総回転数</th>
             <th>有利区間</th>
-            <th>連荘数</th> <!-- New column for 連荘数 -->
+            <th>連荘数</th>
+			<th>差枚数</th>
+            <th>機械割</th>
         </tr>
     </thead>
     <tbody>
@@ -307,55 +385,241 @@
 
 
 
-<input type="text" id="input-field" readonly>
+<input type="text" id="input-field">
 
 
 <div id="touch-panel">
   <div class="row">
-    <button class="num-btn">7</button>
-    <button class="num-btn">8</button>
-    <button class="num-btn">9</button>
-    <button class="op-btn">÷</button>
+    <button class="num-btn" data-value="7">7</button>
+    <button class="num-btn" data-value="8">8</button>
+    <button class="num-btn" data-value="9">9</button>
+    <button class="op-btn" data-value="÷">÷</button>
   </div>
   <div class="row">
-    <button class="num-btn">4</button>
-    <button class="num-btn">5</button>
-    <button class="num-btn">6</button>
-    <button class="op-btn">×</button>
+    <button class="num-btn" data-value="4">4</button>
+    <button class="num-btn" data-value="5">5</button>
+    <button class="num-btn" data-value="6">6</button>
+    <button class="op-btn" data-value="×">×</button>
   </div>
   <div class="row">
-    <button class="num-btn">1</button>
-    <button class="num-btn">2</button>
-    <button class="num-btn">3</button>
-    <button class="op-btn">-</button>
+    <button class="num-btn" data-value="1">1</button>
+    <button class="num-btn" data-value="2">2</button>
+    <button class="num-btn" data-value="3">3</button>
+    <button class="op-btn" data-value="-">-</button>
   </div>
   <div class="row">
-    <button class="num-btn">0</button>
-    <button class="num-btn">.</button>
-    <button class="op-btn">=</button>
-    <button class="op-btn">+</button>
+    <button class="num-btn" data-value="0">0</button>
+    <button class="num-btn" data-value=".">.</button>
+    <button class="op-btn" data-value="=">=</button>
+    <button class="op-btn" data-value="+">+</button>
   </div>
   <div class="row">
-    <button id="ac-btn">AC</button>
-    <button id="c-btn">BS</button>
-    <button id="percent-btn">%</button>
-    <button id="plus-minus-btn">±</button>
+    <button id="ac-btn" data-value="AC">AC</button>
+    <button id="c-btn" data-value="BS">BS</button>
+    <button id="percent-btn" data-value="%">%</button>
+    <button id="plus-minus-btn" data-value="±">±</button>
   </div>
   <div class="row">
-    <button id="big-btn">ビッグ</button>
-    <button id="regular-btn">レギュラー</button>
-    <button id="current-btn">現在</button>
+    <button id="big-btn" data-value="ビッグ">ビッグ</button>
+    <button id="regular-btn" data-value="レギュラー">レギュラー</button>
+    <button id="current-btn" data-value="現在">現在</button>
   </div>
   <div class="row">
-    <button id="reverse-toggle">逆順</button>
-    <button id="del-btn">1行削除</button>
-    <button id="clear-btn">全消し</button>
+    <button id="reverse-toggle" data-value="逆順">逆順</button>
+    <button id="del-btn" data-value="1行削除">1行削除</button>
+    <button id="clear-btn" data-value="全消し">全消し</button>
   </div>
 </div>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+
+
+<script>// teramobaボタン
+function transformDataForOgiya() {
+    const dataInput = document.getElementById('dataInput').value;
+    const lines = dataInput.trim().split('\n');
+    const transformedLines = lines.map(line => {
+        const [id, time, spins, total, type] = line.split('\t');
+        let newType = '';
+        if (type === 'BB') {
+            newType = 'ビッグ';
+        } else if (type === 'RB') {
+            newType = 'レギュラー';
+        }
+        return `${time}\t${newType}\t${spins}`;
+    });
+    const transformedData = transformedLines.join('\n');
+    document.getElementById('dataInput').value = transformedData;
+    
+    // 保存処理を追加
+    localStorage.setItem('dataInput', transformedData);
+}
+</script>
+
+
+
+
+<script>//P'sCUBE(差枚無し)ボタン
+function transformDataForPscube0() {
+    const dataInput = document.getElementById('dataInput').value;
+    const lines = dataInput.trim().split('\n');
+    const transformedLines = lines.map(line => {
+        const [id, time, spins, type] = line.split('\t');
+        let newType = '';
+        if (type === 'BIG') {
+            newType = 'ビッグ';
+        } else if (type === 'REG') {
+            newType = 'レギュラー';
+        }
+        return `${time}\t${newType}\t${spins}`;
+    });
+    const transformedData = transformedLines.join('\n');
+    document.getElementById('dataInput').value = transformedData;
+    
+    // 保存処理を追加
+    localStorage.setItem('dataInput', transformedData);
+}
+</script>
+
+
+
+
+<script>//P'sCUBE(差枚有り)ボタン
+function transformDataForPscube1() {
+    const dataInput = document.getElementById('dataInput').value;
+    const lines = dataInput.trim().split('\n');
+    const transformedLines = lines.map(line => {
+        const [id, time, spins, total, type] = line.split('\t');
+        let newType = '';
+        if (type === 'BIG') {
+            newType = 'ビッグ';
+        } else if (type === 'REG') {
+            newType = 'レギュラー';
+        }
+        return `${time}\t${newType}\t${spins}`;
+    });
+    const transformedData = transformedLines.join('\n');
+    document.getElementById('dataInput').value = transformedData;
+    
+    // 保存処理を追加
+    localStorage.setItem('dataInput', transformedData);
+}
+</script>
+
+
+
+
+    <script>// P-DO専用ボタン
+function transformDataForPdo() {
+    const dataInput = document.getElementById('dataInput');
+    let data = dataInput.value;
+
+    // "ゲーム数"と時間の組み合わせを見つけるための正規表現
+    const regex = /^.*数\s+\d{1,2}:\d{2}$/gm;
+
+    // "ゲーム数"を含む行を見つけて、その行とその上の行を削除
+    let match = regex.exec(data);
+    if (match) {
+        // マッチした行のインデックスを取得
+        const index = match.index+6;
+        // インデックスから先頭までの部分を削除
+        data = data.substring(index);
+    }
+    // 各要素をタブで区切り、改行で区切る
+    data = data.replace(/(\d{2}:\d{2})\s+(\w+)\s+(\d+)/g, '$1\t$2\t$3');
+
+    // BBをビッグに、RBをレギュラーに置換
+    data = data.replace(/BB/g, "ビッグ").replace(/RB/g, "レギュラー");
+
+    // 各行の末尾の「回」を削除
+    data = data.replace(/\s回$/gm, "");
+
+    dataInput.value = data;
+
+    // 保存処理を追加
+    localStorage.setItem('dataInput', data);
+}
+    </script>
+
+
+
+
+
+<script>//コピーボタン
+function copyToClipboard() {
+    const dataInput = document.getElementById('dataInput').value;
+
+    // クリップボードにコピー
+    navigator.clipboard.writeText(dataInput).then(() => {
+
+        // 保存処理を追加
+        localStorage.setItem('dataInput', dataInput);
+        // コピーが成功した場合、メッセージを表示
+        const message = document.getElementById('copyMessage');
+        message.style.display = 'block';
+        message.style.opacity = 1;
+
+        // 5秒後にフェードアウト
+        setTimeout(() => {
+            let fadeEffect = setInterval(() => {
+                if (!message.style.opacity) {
+                    message.style.opacity = 1;
+                }
+                if (message.style.opacity > 0) {
+                    message.style.opacity -= 0.1;
+                } else {
+                    clearInterval(fadeEffect);
+                    message.style.display = 'none';
+                }
+            }, 50);
+        }, 5000);
+    }).catch(err => {
+        console.error('クリップボードにコピーできませんでした:', err);
+    });
+}
+</script>
+
+
+
+<script>
+// データ自動保存機能
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInput = document.getElementById('dataInput');
+    
+    function handleDataStorage(value) {
+        value = value.trim();
+        if (value && value !== '""') {
+            localStorage.setItem('dataInput', value);
+        } else {
+            localStorage.removeItem('dataInput');
+        }
+    }
+    
+    // 初期データ読み込み
+    const savedData = localStorage.getItem('dataInput');
+    if (savedData && savedData !== '""') {
+        dataInput.value = savedData;
+    }
+    
+    // データ変更時の処理
+    dataInput.addEventListener('input', () => handleDataStorage(dataInput.value));
+    dataInput.addEventListener('change', () => handleDataStorage(dataInput.value));
+});
+
+// データ削除ボタンの追加
+function clearData() {
+    const dataInput = document.getElementById('dataInput');
+    if (confirm("保存されたデータを削除してもよろしいですか?")) {
+        localStorage.removeItem('dataInput');
+        dataInput.value = ""; // テキストエリアを空にする
+    }
+}
+</script>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -391,9 +655,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    let shouldClearOnNextInput = false;
+
     // 数字ボタンの処理
     numButtons.forEach(button => {
         button.addEventListener('click', function() {
+            if (shouldClearOnNextInput) {
+                inputField.value = ''; // 前回の結果をクリア
+                currentCalc = ''; // 現在の計算もクリア
+                shouldClearOnNextInput = false; // 次回の入力でクリアしないようにする
+            }
             inputField.value += this.textContent;
             currentCalc += this.textContent;
             if (MAX_VALUE !== Infinity && parseFloat(inputField.value) > MAX_VALUE) {
@@ -406,6 +677,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 演算子ボタンの処理
     opButtons.forEach(button => {
         button.addEventListener('click', function() {
+            const lastChar = currentCalc.slice(-1);
+            const operators = ['+', '-', '×', '÷'];
+
             if (this.textContent === '=') {
                 try {
                     currentCalc = currentCalc.replace(/×/g, '*').replace(/÷/g, '/');
@@ -414,13 +688,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         inputField.value = MAX_VALUE;
                     }
                     currentCalc = inputField.value;
+                    shouldClearOnNextInput = true; // 次の入力時にクリアするフラグを立てる
                 } catch (e) {
                     inputField.value = 'Error';
                     currentCalc = '';
+                    shouldClearOnNextInput = true; // 次の入力時にクリアするフラグを立てる
                 }
             } else {
+                // 演算子の上書き処理
+                if (operators.includes(lastChar)) {
+                    currentCalc = currentCalc.slice(0, -1); // 最後の演算子を削除
+                    inputField.value = inputField.value.slice(0, -1); // 表示も更新
+                }
                 inputField.value += this.textContent;
                 currentCalc += this.textContent;
+                shouldClearOnNextInput = false; // 続けて計算をするのでクリアしない
             }
         });
     });
@@ -503,29 +785,36 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.toggle('active', isReverse);
     });
 
-    // DELボタンの処理
-    delButton.addEventListener('click', function() {
-        let data = dataInput.value.trim().split('\n');
-        if (data.length > 0) {
-            if (isReverse) {
-                data.shift(); // 逆順モードの場合、最初の要素を削除
-            } else {
-                data.pop(); // 通常モードの場合、最後の要素を削除
-            }
-            dataInput.value = data.join('\n');
-            calculateTotals(); // データが変更されたので、総計を再計算
+	// DELボタンの処理
+	delButton.addEventListener('click', function() {
+    let data = dataInput.value.trim().split('\n');
+    if (data.length > 0) {
+        if (isReverse) {
+            data.shift(); // 逆順モードの場合、最初の要素を削除
+        } else {
+            data.pop(); // 通常モードの場合、最後の要素を削除
         }
-    });
+        dataInput.value = data.join('\n');
 
-    // 全消しボタンの処理
-    clearAllButton.addEventListener('click', function() {
-        if (confirm('本当にすべてのデータを消去しますか?')) {
-            dataInput.value = ''; // テキストエリアの内容を空にする
-            inputField.value = ''; // 入力フィールドも空にする
-            currentCalc = ''; // 現在の計算をリセット
-            calculateTotals(); // テーブルを更新
-        }
-    });
+		// 保存処理を追加
+		localStorage.setItem('dataInput', JSON.stringify(data.join('\n')));
+        calculateTotals(); // データが変更されたので、総計を再計算
+    }
+	});
+
+	// 全消しボタンの処理
+	clearAllButton.addEventListener('click', function() {
+    if (confirm('本当にすべてのデータを消去しますか?')) {
+        dataInput.value = ''; // テキストエリアの内容を空にする
+        inputField.value = ''; // 入力フィールドも空にする
+        currentCalc = ''; // 現在の計算をリセット
+        calculateTotals(); // テーブルを更新
+
+        // 保存されたデータを削除
+        localStorage.removeItem('dataInput');
+    }
+	});
+
 
     function addEntry(bonusType) {
         const now = new Date();
@@ -545,6 +834,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         dataInput.value = data.join('\n');
+		    // 保存処理を追加
+		localStorage.setItem('dataInput', JSON.stringify(data.join('\n')));
         inputField.value = '';
         calculateTotals();
     }
@@ -565,6 +856,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         dataInput.value = data.join('\n');
+		    // 保存処理を追加
+		localStorage.setItem('dataInput', JSON.stringify(data.join('\n')));
         inputField.value = '';
         calculateTotals();
     }
@@ -573,6 +866,8 @@ document.addEventListener('DOMContentLoaded', function() {
     bigButton.addEventListener('click', function(event) {
         event.preventDefault(); // デフォルトの動作を防止
         addEntry('ビッグ');
+            inputField.value = ''; // 入力フィールドも空にする
+            currentCalc = ''; // 現在の計算をリセット
         scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
     });
 
@@ -580,6 +875,8 @@ document.addEventListener('DOMContentLoaded', function() {
     regularButton.addEventListener('click', function(event) {
         event.preventDefault(); // デフォルトの動作を防止
         addEntry('レギュラー');
+            inputField.value = ''; // 入力フィールドも空にする
+            currentCalc = ''; // 現在の計算をリセット
         scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
     });
 
@@ -587,35 +884,157 @@ document.addEventListener('DOMContentLoaded', function() {
     currentButton.addEventListener('click', function(event) {
         event.preventDefault(); // デフォルトの動作を防止
         registerCurrentInput();
+            inputField.value = ''; // 入力フィールドも空にする
+            currentCalc = ''; // 現在の計算をリセット
         scrollToLastEntry(); // 登録後にテーブルの最終行までスクロール
     });
 
     function scrollToLastEntry() {
         const table = document.querySelector('table'); // テーブルを選択
-        const lastRow = table.rows[table.rows.length - 2]; // 最終行を選択
+        const lastRow = table.rows[table.rows.length - 3]; // 最終行を選択
         if (lastRow) {
             lastRow.scrollIntoView({ behavior: 'smooth' }); // 最終行までスムーズにスクロール
         }
     }
 });
 
-    function gold() {
+    function golda() {
         document.getElementById("bigValue").value = "69";
         document.getElementById("regularValue").value = "29";
-        document.getElementById("resetValue").value = "2000";
-        document.getElementById("spinThreshold").value = "32";
+        document.getElementById("resetValue").value = "1600";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "1400";
+        document.getElementById("resetOnConsecutiveWins").value = "5";
         calculateTotals(); // 設定変更後に再計算
     }
 
-    function black() {
+    function goldb() {
+        document.getElementById("bigValue").value = "69";
+        document.getElementById("regularValue").value = "29";
+        document.getElementById("resetValue").value = "2000";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "1400";
+        document.getElementById("resetOnConsecutiveWins").value = "5";
+        calculateTotals(); // 設定変更後に再計算
+    }
+
+    function goldc() {
+        document.getElementById("bigValue").value = "69";
+        document.getElementById("regularValue").value = "29";
+        document.getElementById("resetValue").value = "3000";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "2600";
+        document.getElementById("resetOnConsecutiveWins").value = "5";
+        calculateTotals(); // 設定変更後に再計算
+    }
+
+    function blacka() {
         document.getElementById("bigValue").value = "59";
         document.getElementById("regularValue").value = "24";
-        document.getElementById("resetValue").value = "1700";
-        document.getElementById("spinThreshold").value = "32";
+        document.getElementById("resetValue").value = "1600";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "1400";
+        document.getElementById("resetOnConsecutiveWins").value = "7";
+        calculateTotals(); // 設定変更後に再計算
+    }
+
+    function blackb() {
+        document.getElementById("bigValue").value = "59";
+        document.getElementById("regularValue").value = "24";
+        document.getElementById("resetValue").value = "2525";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "1400";
+        document.getElementById("resetOnConsecutiveWins").value = "7";
+        calculateTotals(); // 設定変更後に再計算
+    }
+
+    function blackc() {
+        document.getElementById("bigValue").value = "59";
+        document.getElementById("regularValue").value = "24";
+        document.getElementById("resetValue").value = "3650";
+        document.getElementById("spinThreshold").value = "100";
+        document.getElementById("neraimeValue").value = "2600";
+        document.getElementById("resetOnConsecutiveWins").value = "7";
         calculateTotals(); // 設定変更後に再計算
     }
 
 </script>
+
+
+
+
+
+<script>
+document.addEventListener('keydown', function(event) {
+    // 現在のアクティブ要素を取得
+    const activeElement = document.activeElement;
+
+    // テキストエリアや入力フィールドがアクティブな場合は電卓の入力を無効にする
+    if (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT') {
+        return; // キャンセルして終了
+    }
+
+    let targetButton;
+    
+    switch(event.key) {
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+            targetButton = document.querySelector(`.num-btn[data-value="${event.key}"]`);
+            break;
+        case 'Delete':
+            targetButton = document.getElementById('ac-btn');
+            break;
+        case 'Backspace':
+            targetButton = document.getElementById('c-btn');
+            break;
+        case 'Enter':
+            targetButton = document.querySelector('.op-btn[data-value="="]');
+            break;
+        case '-':
+            targetButton = document.querySelector('.op-btn[data-value="-"]');
+            break;
+        case '+':
+            targetButton = document.querySelector('.op-btn[data-value="+"]');
+            break;
+        case '/':
+            targetButton = document.querySelector('.op-btn[data-value="÷"]');
+            break;
+        case '*':
+            targetButton = document.querySelector('.op-btn[data-value="×"]');
+            break;
+        case '.':
+            targetButton = document.querySelector('.num-btn[data-value="."]');
+            break;
+        case '%':
+            targetButton = document.getElementById('percent-btn');
+            break;
+        case 'b':
+        case 'B':
+            targetButton = document.getElementById('big-btn');
+            break;
+        case 'r':
+        case 'R':
+            targetButton = document.getElementById('regular-btn');
+            break;
+        case 'c':
+        case 'C':
+            targetButton = document.getElementById('current-btn');
+            break;
+    }
+
+    if (targetButton) {
+        event.preventDefault(); // デフォルトのキーボード動作を防ぐ
+        targetButton.click(); // ボタンのクリックイベントをトリガー
+        
+        // オプション: ボタンにビジュアルフィードバックを追加
+        targetButton.classList.add('active');
+        setTimeout(() => targetButton.classList.remove('active'), 100);
+    }
+});
+</script>
+
+
+
 
 
 <script>
@@ -649,89 +1068,207 @@ function displayTableAsImage() {
 }
 </script>
 
+    <script>//並び替えボタンと回を消去ボタン
+    function sortData() {
+        let data = document.getElementById("dataInput").value.trim().split('\n');
+        data.sort((a, b) => {
+            let timeA = a.split('\t')[0];
+            let timeB = b.split('\t')[0];
+            return timeA.localeCompare(timeB);
+        });
+        const sortedData = data.join('\n');
+        document.getElementById("dataInput").value = sortedData;
+        
+        // 改行を含めて保存する
+        localStorage.setItem('dataInput', JSON.stringify(sortedData));
+    }
 
-    <script>
-        function sortData() {
-            let data = document.getElementById("dataInput").value.trim().split('\n');
-            data.sort((a, b) => {
-                let timeA = a.split('\t')[0];
-                let timeB = b.split('\t')[0];
-                return timeA.localeCompare(timeB);
-            });
-            document.getElementById("dataInput").value = data.join('\n');
+    // ページ読み込み時に改行を復元して表示
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataInput = document.getElementById('dataInput');
+        const savedData = JSON.parse(localStorage.getItem('dataInput'));
+        if (savedData) {
+            dataInput.value = savedData;
         }
 
-        function replaceOrRemove() {
-            let data = document.getElementById("dataInput").value;
-            data = data.replace(/回/g, '');
-            document.getElementById("dataInput").value = data;
+        // 入力や変更ごとに保存
+        dataInput.addEventListener('input', function() {
+            localStorage.setItem('dataInput', JSON.stringify(dataInput.value));
+        });
+    });
+
+    // 回を消去ボタン
+    function replaceOrRemove() {
+        let data = document.getElementById("dataInput").value;
+        data = data.replace(/回/g, '');
+        document.getElementById("dataInput").value = data;
+
+        // 改行を含めて保存する
+        localStorage.setItem('dataInput', JSON.stringify(data));
+    }
+
+    // DOMContentLoadedイベントで関数を呼び出す
+    document.addEventListener('DOMContentLoaded', calculateTotals);
+function calculateTotals() {
+    // 入力値の取得
+    let bigValue = parseInt(document.getElementById("bigValue").value, 10);
+    let regularValue = parseInt(document.getElementById("regularValue").value, 10);
+    let resetValue = parseInt(document.getElementById("resetValue").value, 10);
+    let gameBasedCalculation = document.getElementById("gameBasedCalculation").checked;
+    let maxValue = parseInt(document.getElementById("maxValue").value, 10) || Infinity;
+    let consecutiveResetValue = parseInt(document.getElementById("resetOnConsecutiveWins").value, 10);
+    let PercentResetValue = parseFloat(document.getElementById("resetOnPercent").value);
+    let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
+    let neraimeValue = parseInt(document.getElementById("neraimeValue").value, 10);
+    let bigMedal = parseInt(document.getElementById("bigMedal").value, 10);
+    let regularMedal = parseInt(document.getElementById("regularMedal").value, 10);
+    let spinsPer50Medals = parseInt(document.getElementById("50Medal").value, 10);
+
+    // データの準備
+    let data = document.getElementById("dataInput").value.trim().split('\n');
+    let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = "";
+
+    // 変数の初期化
+    let count = 0;
+    let total = 0;
+    let advantageousZone = 0;
+    let consecutiveWins = 0;
+    let lastSpin = null;
+
+    // 集計用変数
+    let totalSpins = 0;
+    let filteredSpins = 0;
+    let totalBigCount = 0;
+    let filteredBigCount = 0;
+    let totalRegularCount = 0;
+    let filteredRegularCount = 0;
+    let medalDifference = 0;
+
+    // ゲームベース計算の場合、最初の行にダミーデータを追加
+    if (gameBasedCalculation) {
+        data.unshift("現在\t-\t0");
+    }
+
+// データ処理
+data.forEach((line, index) => {
+    let [time, bonus, spins] = line.split('\t');
+    spins = Math.min(parseInt(spins, 10), maxValue);
+    total += spins;
+    totalSpins += spins;
+
+    // 33回転以上の条件を追加
+    let isFilteredSpin = spins >= 33;
+
+    // ボーナス回数カウント
+    if (bonus === 'ビッグ') {
+        totalBigCount++;
+        if (isFilteredSpin) {
+            filteredBigCount++;
+            filteredSpins += spins;  // 33回転以上のスピン数を加算
+        }
+    }
+    if (bonus === 'レギュラー') {
+        totalRegularCount++;
+        if (isFilteredSpin) {
+            filteredRegularCount++;
+            filteredSpins += spins;  // 33回転以上のスピン数を加算
+        }
+    }
+
+        // 有利区間の計算
+        if (gameBasedCalculation && lastSpin !== null) {
+            advantageousZone += spins + (lastSpin === 'ビッグ' ? bigValue : lastSpin === 'レギュラー' ? regularValue : 0);
+        } else {
+            advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
         }
 
-        function calculateTotals() {
-            let bigValue = parseInt(document.getElementById("bigValue").value, 10);
-            let regularValue = parseInt(document.getElementById("regularValue").value, 10);
-            let resetValue = parseInt(document.getElementById("resetValue").value, 10);
-            let spinThreshold = parseInt(document.getElementById("spinThreshold").value, 10);
-            let gameBasedCalculation = document.getElementById("gameBasedCalculation").checked;
-            let maxValue = parseInt(document.getElementById("maxValue").value, 10) || Infinity; // 上限値を取得
-            let data = document.getElementById("dataInput").value.trim().split('\n');
-            let tableBody = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = "";
-            let total = 0;
-            let advantageousZone = 0;
-            let consecutiveWins = 0;
-            let lastSpin = null;
+        // 連荘数と確率計算
+        if (bonus === 'ビッグ' || bonus === 'レギュラー') {
+            consecutiveWins = spins <= spinThreshold ? (consecutiveWins || 0) + 1 : 1;
+        } else {
+            consecutiveWins = "";
+        }
 
-            if (gameBasedCalculation) {
-                let additionalRowData = "現在\t-\t0";
-                data.unshift(additionalRowData);
+        // 差枚数と機械割の計算
+        medalDifference = Math.round((totalBigCount * bigMedal) + (totalRegularCount * regularMedal) - ((total / spinsPer50Medals) * 50));
+        let machineRate = ((total * 3 + medalDifference) / (total * 3)) * 100;
+
+        // テーブル行の作成
+        let row = tableBody.insertRow();
+        row.insertCell(0).innerText = count++;
+        row.insertCell(1).innerText = bonus;
+        row.insertCell(2).innerText = spins;
+        row.insertCell(3).innerText = total;
+        row.insertCell(4).innerText = advantageousZone;
+        row.insertCell(5).innerText = (consecutiveWins === 1) ? '' : consecutiveWins;
+        row.insertCell(6).innerText = Math.round(medalDifference);
+        row.insertCell(7).innerText = machineRate.toFixed(2) + '%';
+
+        // スタイル適用
+        row.classList.add(
+            bonus === 'ビッグ' ? 'big' : 
+            bonus === 'レギュラー' ? 'regular' : 
+            'dark-theme'
+        );
+
+        if (advantageousZone > neraimeValue) row.classList.add('neraime-zone');
+        if (advantageousZone > resetValue) row.classList.add('reset-zone');
+
+        // リセット処理
+        if (advantageousZone > resetValue || consecutiveWins >= consecutiveResetValue || machineRate <= PercentResetValue) {
+            if (index + 1 >= data.length || parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold) {
+                advantageousZone = 0;
+                row.classList.add('reset');
+                consecutiveWins = 0;
+                total = 0;
+                totalBigCount = 0;
+                totalRegularCount = 0;
+                medalDifference = 0;
             }
-
-            data.forEach((line, index) => {
-                let [time, bonus, spins] = line.split('\t');
-                spins = Math.min(parseInt(spins, 10), maxValue); // 上限値を適用
-                total += spins;
-
-                if (gameBasedCalculation && lastSpin !== null) {
-                    advantageousZone += spins + (lastSpin === 'ビッグ' ? bigValue : lastSpin === 'レギュラー' ? regularValue : 0);
-                } else {
-                    advantageousZone += spins + (bonus === 'ビッグ' ? bigValue : bonus === 'レギュラー' ? regularValue : 0);
-                }
-
-                if (lastSpin !== null && spins <= spinThreshold) {
-                    consecutiveWins++;
-                } else {
-                    consecutiveWins = 1;
-                }
-
-                let row = tableBody.insertRow();
-                row.insertCell(0).innerText = time;
-                row.insertCell(1).innerText = bonus;
-                row.insertCell(2).innerText = spins;
-                row.insertCell(3).innerText = total;
-                row.insertCell(4).innerText = advantageousZone;
-                row.insertCell(5).innerText = (consecutiveWins === 1) ? '' : consecutiveWins;  // 連荘数の表示
-
-                if (bonus === 'ビッグ') {
-                    row.classList.add('big');
-                } else if (bonus === 'レギュラー') {
-                    row.classList.add('regular');
-                } else {
-                    row.classList.add('dark-theme');
-                }
-
-                if (advantageousZone > resetValue) {
-                    row.classList.add('reset-zone');
-                }
-
-                if (advantageousZone > resetValue && (index + 1 < data.length && parseInt(data[index + 1].split('\t')[2], 10) > spinThreshold)) {
-                    advantageousZone = 0;
-                    row.classList.add('reset');
-                }
-
-                lastSpin = bonus;
-            });
         }
+
+        lastSpin = bonus;
+    });
+// 確率計算
+let bigRate = (filteredSpins / filteredBigCount) || 0;
+let regularRate = (filteredSpins / filteredRegularCount) || 0;
+let combinedRate = (filteredSpins / (filteredBigCount + filteredRegularCount)) || 0;
+
+// 小数点第2位まで四捨五入
+bigRate = bigRate > 0 ? Number(bigRate.toFixed(2)) : 0;
+regularRate = regularRate > 0 ? Number(regularRate.toFixed(2)) : 0;
+combinedRate = combinedRate > 0 ? Number(combinedRate.toFixed(2)) : 0;
+
+// 結果表示
+let resultsDiv = document.getElementById("results");
+if (!resultsDiv) {
+    console.error("resultsDiv要素が見つかりません");
+    return; // ここで処理を中断する
+    resultsDiv = document.createElement("div");
+    resultsDiv.id = "results";
+    resultsDiv.style.color = "white";
+    resultsDiv.style.marginBottom = "20px";
+    document.body.insertBefore(resultsDiv, document.getElementById("dataTable"));
+}
+
+// innerHTMLの書き込み
+resultsDiv.innerHTML = `
+    <p>ビッグ回数: ${filteredBigCount}</p>
+    <p>ビッグ確率: 1/${bigRate}</p>
+    <p>ビッグ確率: 1/${bigRate}</p>
+    <p>レギュラー回数: ${filteredRegularCount}</p>
+    <p>レギュラー確率: 1/${regularRate}</p>
+    <p>ボーナス回数: ${filteredBigCount + filteredRegularCount}</p>
+    <p>合成確率: 1/${combinedRate}</p>
+    <p>33回転以上の合計ゲーム数: ${filteredSpins}</p>
+`;
+}
+
+
+
+
+
 
 
 
@@ -745,8 +1282,10 @@ function displayTableAsImage() {
             });
         }
     </script>
+	
 	<script>
-    // Prevent zoom on double tap
+    // ダブルタップによるズームを防止する
+
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(event) {
         const now = (new Date()).getTime();
@@ -756,5 +1295,9 @@ function displayTableAsImage() {
         lastTouchEnd = now;
     }, false);
 </script>
+<p>このツールは、沖ドキ BLACK および GOLD の有利区間をチェックし、データを管理するために開発しました。回転数やボーナス情報を入力することで、有利区間の推移や連荘数を簡単に確認できます。</p>
+<footer>
+    <p>© 2024 沖ドキ有利区間チェッカー | <a href="/privacy-policy">プライバシーポリシー</a> | <a href="/terms-of-use">利用規約</a></p>
+</footer>
 </body>
 </html>
