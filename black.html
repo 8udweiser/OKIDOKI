@@ -1230,39 +1230,49 @@ data.forEach((line, index) => {
 
         lastSpin = bonus;
     });
-// 確率計算
-let bigRate = (filteredSpins / filteredBigCount) || 0;
-let regularRate = (filteredSpins / filteredRegularCount) || 0;
-let combinedRate = (filteredSpins / (filteredBigCount + filteredRegularCount)) || 0;
+    // 確率計算
+    let bigRate = (filteredSpins / filteredBigCount) || 0;
+    let regularRate = (filteredSpins / filteredRegularCount) || 0;
+    let combinedRate = (filteredSpins / (filteredBigCount + filteredRegularCount)) || 0;
 
-// 小数点第2位まで四捨五入
-bigRate = bigRate > 0 ? Number(bigRate.toFixed(2)) : 0;
-regularRate = regularRate > 0 ? Number(regularRate.toFixed(2)) : 0;
-combinedRate = combinedRate > 0 ? Number(combinedRate.toFixed(2)) : 0;
+    // 小数点第2位まで四捨五入
+    bigRate = bigRate > 0 ? Math.round(bigRate) : 0;
+    regularRate = regularRate > 0 ? Math.round(regularRate) : 0;
+    combinedRate = combinedRate > 0 ? Math.round(combinedRate) : 0;
 
-// 結果表示
-let resultsDiv = document.getElementById("results");
-if (!resultsDiv) {
-    console.error("resultsDiv要素が見つかりません");
-    return; // ここで処理を中断する
-    resultsDiv = document.createElement("div");
-    resultsDiv.id = "results";
-    resultsDiv.style.color = "white";
-    resultsDiv.style.marginBottom = "20px";
-    document.body.insertBefore(resultsDiv, document.getElementById("dataTable"));
-}
+    // 結果表示用のdiv要素を作成または取得
+    let resultsDiv = document.getElementById("results");
+    if (!resultsDiv) {
+        resultsDiv = document.createElement("div");
+        resultsDiv.id = "results";
+        // スタイルの追加
+        resultsDiv.style.color = "white";
+        resultsDiv.style.marginBottom = "20px";
+        resultsDiv.style.backgroundColor = "#333";
+        resultsDiv.style.padding = "10px";
+        resultsDiv.style.borderRadius = "5px";
+        
+        // テーブルの前に結果表示要素を挿入
+        const dataTable = document.getElementById("dataTable");
+        if (dataTable) {
+            dataTable.parentNode.insertBefore(resultsDiv, dataTable);
+        } else {
+            document.body.appendChild(resultsDiv);
+        }
+    }
 
-// innerHTMLの書き込み
-resultsDiv.innerHTML = `
-    <p>ビッグ回数: ${filteredBigCount}</p>
-    <p>ビッグ確率: 1/${bigRate}</p>
-    <p>ビッグ確率: 1/${bigRate}</p>
-    <p>レギュラー回数: ${filteredRegularCount}</p>
-    <p>レギュラー確率: 1/${regularRate}</p>
-    <p>ボーナス回数: ${filteredBigCount + filteredRegularCount}</p>
-    <p>合成確率: 1/${combinedRate}</p>
-    <p>33回転以上の合計ゲーム数: ${filteredSpins}</p>
-`;
+    // 結果の表示
+    resultsDiv.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0px;">
+            <p>ビッグ回数: ${filteredBigCount}</p>
+            <p>ビッグ確率: 1/${bigRate}</p>
+            <p>レギュラー回数: ${filteredRegularCount}</p>
+            <p>レギュラー確率: 1/${regularRate}</p>
+            <p>ボーナス回数: ${filteredBigCount + filteredRegularCount}</p>
+            <p>合成確率: 1/${combinedRate}</p>
+            <p>33回転以上の合計ゲーム数: ${filteredSpins}</p>
+        </div>
+    `;
 }
 
 
